@@ -89,6 +89,7 @@ function init() {
 	document.getElementById("area").appendChild(elementDataGui);
 
 	scene = new THREE.Scene();
+	console.log("asdasdasdasdasd");
 	scene.background = new THREE.Color( 0xffffff );
 
 	// Setup the camera
