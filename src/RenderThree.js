@@ -80,7 +80,7 @@ function initLoadingManager() {
 function init() {
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize(window.innerWidth, window.innerHeight);
-	
+	var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
 	dataGui = new dat.GUI();
 	var elementDataGui = dataGui.domElement.offsetParent;
 
@@ -89,6 +89,7 @@ function init() {
 	document.getElementById("area").appendChild(elementDataGui);
 
 	scene = new THREE.Scene();
+	console.log('ola mundo');
 	scene.background = new THREE.Color( 0xffffff );
 
 	// Setup the camera
