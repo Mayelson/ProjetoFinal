@@ -40,7 +40,6 @@ install sass-loader --save --dev
 # npm install vue-fullscreen
 
 # npm install microcache
+
 ```
-
-
-For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
+For learning Branching and Merging, consult this [docs git-fast-version-control](https://git-scm.com/book/pt-br/v2/Git-Branching-Basic-Branching-and-Merging)
