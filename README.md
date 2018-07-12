@@ -13,30 +13,34 @@ npm run dev
 
 # build for production with minification
 npm run build
-```
 
-# npm install -g vue-cli - para instalar o vue cli
 
-# npm install webpack-simple mirobrigaproject - para criar o novo projeto
+#install vue cli
+npm install -g vue-cli  
 
-# npm install - para instalar as dependencias
+#create a new project vue
+npm install webpack-simple mirobrigaproject
 
-# npm run dev - para executar o projeto
+#install vue-router 
+npm install vue-router --save
 
-# npm install vue-router --save - para instalar as rotas
 
-# npm install bootstrap -
+# install bootstrap
+npm install bootstrap
 
-# npm install jQuery --save 
+#installjQuery
+npm install jQuery --save 
 
-# npm install node-sass --save --dev
+# npm install node
+npm install node-sass --save --dev
 
-# npm install sass-loader --save --dev
+# npm install sass
+install sass-loader --save --dev
 
 # npm install vue-fullscreen
 
 # npm install microcache
-
+```
 
 
 For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
