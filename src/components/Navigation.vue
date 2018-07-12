@@ -18,13 +18,13 @@
 					</p>
 					<div class="row">
 						<div class="col-8 offset-md-2">
-							<router-link :to="{ name: 'fases', params: { fase: 1 }}"  class="btn btn-primary btn-lg btn-block">Primeira Fase</router-link>
+							<a class="btn btn-primary btn-lg btn-block" href="http://localhost:8080/fases.html?fase=1">Primeira Fase</a>
 						</div>
 					</div>
 					<br>
 					<div class="row">
 						<div class="col-8 offset-md-2">
-							<a class="btn btn-primary btn-lg btn-block" href="http://localhost:8080/fase2.html">Segunda Fase</a>
+							<a class="btn btn-primary btn-lg btn-block" href="http://localhost:8080/fases.html?fase=2">Segunda Fase</a>
 						</div>
 					</div>
 					<br>
