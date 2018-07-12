@@ -24,7 +24,7 @@ function initLoadingManager() {
  	const updateAmount = 5; // in percent of bar width, should divide 100 evenly
  	
  	var tempoInicial = Date.now();
-	
+ 	
  	const animateBar = () => {
  		percentComplete += updateAmount;
 
@@ -58,10 +58,10 @@ function initLoadingManager() {
 	    cancelAnimationFrame( frameID );
 	    var duracao = (Date.now() - tempoInicial)/1000;
 	    console.log("Demorou" + " " + duracao + " " +"segundos"+" " + "a ser carregado");
-	   
-	   	initAudio();
-		 guiData();
-		
+	    
+	    initAudio();
+	    guiData();
+	    
 	};
 
 	manager.onError = function ( e ) { 
@@ -130,42 +130,42 @@ function guiData() {
 			mute: false
 		},
 		reset: function() {
-		  this.audio.volume = 0.5;
-		  this.audio.mute = false;
-		  this.navigation.speed = 1.8;
-		  this.navigation.turnSpeed = Math.PI*0.005;
-		  this.autoNavigation = false;
+			this.audio.volume = 0.5;
+			this.audio.mute = false;
+			this.navigation.speed = 1.8;
+			this.navigation.turnSpeed = Math.PI*0.005;
+			this.autoNavigation = false;
 		}
 	}
 
 	var audio =  dataGui.addFolder("Son");
 	audio.add(options.audio, 'volume', 0, 1).onChange(function(){
-	    sound.setVolume(options.audio.volume);
+		sound.setVolume(options.audio.volume);
 	}).listen();
 	audio.add(options.audio, 'mute').onChange(function(){
 		if (sound.isPlaying) {
-	     sound.stop();
+			sound.stop();
 		}else{
-	     sound.play();
+			sound.play();
 		}
 	}).listen();
 	audio.open();
 
 	var navigation = dataGui.addFolder("Navigation");
 	navigation.add(options.navigation, 'speed', 0.5, 20).onChange(function(){
-	    player.speed = options.navigation.speed;
+		player.speed = options.navigation.speed;
 	}).listen();
 	navigation.add(options.navigation, 'turnSpeed', 0, 0.1, 0.001).onChange(function(){
-	    player.turnSpeed = Math.PI*options.navigation.turnSpeed;
+		player.turnSpeed = Math.PI*options.navigation.turnSpeed;
 	}).listen();
 	navigation.open();
 	navigation.add(options.navigation, 'autoNavigation').onChange(function(){
 		if (isActiveAuto === true ) {
-	    	console.log("Disabled auto navigation");
-	    	isActiveAuto = false;
+			console.log("Disabled auto navigation");
+			isActiveAuto = false;
 		}else{
-	    	console.log("Activated auto navigation");
-	    	isActiveAuto = true;
+			console.log("Activated auto navigation");
+			isActiveAuto = true;
 		}
 	}).listen();
 
@@ -183,7 +183,7 @@ function initMesshesFirstFase() {
 	var scale = 2;
 	const manager = initLoadingManager();
 	const loader = new THREE.JSONLoader(manager);
-	 var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
+	var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
 
 	loader.load( "../src/models/buildA.json", addModelToScene, manager.onProgress, manager.onError);
 	// After loading JSON from our file, we add it to the scene
@@ -295,10 +295,10 @@ function initTexture(manager) {
 
 	for(var i = 0; i < 6; i++ )
 		// if (imagePrefix + directions[i] + imageSuffix === "../src/img/mirobriga/panoramica/.jpg") {continue;}
-		cubeMaterials.push(new THREE.MeshBasicMaterial({
-			map: loader.load(imagePrefix + directions[i] + imageSuffix, undefined, manager.onProgress),
-			side: THREE.BackSide
-		}));
+	cubeMaterials.push(new THREE.MeshBasicMaterial({
+		map: loader.load(imagePrefix + directions[i] + imageSuffix, undefined, manager.onProgress),
+		side: THREE.BackSide
+	}));
 	var cube = new THREE.Mesh( geometry, cubeMaterials );
 	cube.position.set(50000,59000,0);
 	scene.add( cube );
@@ -356,22 +356,33 @@ function detectColision() {
 	player.mesh = new THREE.Object3D();
 	listenControls();
 	player.rays = [
-		new THREE.Vector3(0, 0, 1),
-		new THREE.Vector3(1, 0, 1),
-		new THREE.Vector3(1, 0, 0),
-		new THREE.Vector3(1, 0, -1),
-		new THREE.Vector3(0, 0, -1),
-		new THREE.Vector3(-1, 0, -1),
-		new THREE.Vector3(-1, 0, 0),
-		new THREE.Vector3(-1, 0, 1)
+	new THREE.Vector3(0, 0, 1),
+	new THREE.Vector3(1, 0, 1),
+	new THREE.Vector3(1, 0, 0),
+	new THREE.Vector3(1, 0, -1),
+	new THREE.Vector3(0, 0, -1),
+	new THREE.Vector3(-1, 0, -1),
+	new THREE.Vector3(-1, 0, 0),
+	new THREE.Vector3(-1, 0, 1)
 	];
 
 	player.raycaster = new THREE.Raycaster();
 	var i, collisions;
+	if((camera.position.x > 660 && camera.position.x < 670) || (camera.position.x < -694 && camera.position.x > - 704) || (camera.position.z > 850 && camera.position.z < 950 ) || (camera.position.z < -850 && camera.position.z > -950) ){
+		
+		prev_pos_x = camera.position.x;
+		prev_pos_z = camera.position.z;
+	}
+	if(camera.position.x > 670 || camera.position.x < -704 || camera.position.z > 950 || camera.position.z < -950 ){
+		
+		camera.position.x = prev_pos_x;
+		camera.position.z = prev_pos_z;
+	}
+	
 	for(i = 0; i<player.rays.length; i++){
-	  player.raycaster.set(camera.position, player.rays[i] );
-	  collisions = player.raycaster.intersectObjects(objects);
-	  	if(collisions.length > 0){
+		player.raycaster.set(camera.position, player.rays[i] );
+		collisions = player.raycaster.intersectObjects(objects);
+		if(collisions.length > 0){
 			if(collisions[0].distance > 4 && collisions[0].distance < 10){
 				prev_pos_x = camera.position.x;
 				prev_pos_z = camera.position.z;
@@ -380,7 +391,7 @@ function detectColision() {
 				camera.position.x = prev_pos_x;
 				camera.position.z = prev_pos_z;
 			}
-	  	}
+		}
 	}
 }
 /************************************Fim detectColision***********************/
@@ -414,16 +425,16 @@ function openScreen() {
 		GoOutFullscreen();
 	}
 	else{
-			var element = document.getElementsByTagName("canvas")[0]
-			element.style.width =  "100%";
-			element.style.height = "100%";
-			element.style.margin = "0";
-			var el = document.getElementById("area")
-			GoInFullscreen(el);
-			GoInFullscreen(el);
-			el.style.width =  "100%";
-			el.style.height = "100%";
-			el.style.margin = "0";
+		var element = document.getElementsByTagName("canvas")[0]
+		element.style.width =  "100%";
+		element.style.height = "100%";
+		element.style.margin = "0";
+		var el = document.getElementById("area")
+		GoInFullscreen(el);
+		GoInFullscreen(el);
+		el.style.width =  "100%";
+		el.style.height = "100%";
+		el.style.margin = "0";
 	}
 }
 /* Get into full screen */
