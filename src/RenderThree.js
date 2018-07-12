@@ -1,3 +1,5 @@
+if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
 var params = location.search.slice(1);
 var fase = params.split('=')[1];
 // var fase = chaveValor[1];
@@ -10,6 +12,22 @@ var valuesForReturns = {};
 var player = { width:60, height:8, speed:1.8, turnSpeed:Math.PI*0.005 };
 var options = null;
 var isActiveAuto = false;
+var elementArea = null;
+
+
+var raycaster;
+var moveForward = false;
+var moveBackward = false;
+var moveLeft = false;
+var moveRight = false;
+var canJump = false;
+
+var prevTime = performance.now();
+var velocity = new THREE.Vector3();
+var direction = new THREE.Vector3();
+var vertex = new THREE.Vector3();
+var color = new THREE.Color();
+var controlsEnabled = false;
 /************************************Inicio initLoadingManager***********************/
 function initLoadingManager() {
 
@@ -75,36 +93,79 @@ function initLoadingManager() {
 }
 /************************************Fim initLoadingManager***********************/
 
+function pointerLock(){
+	var blocker = document.getElementById( 'blocker' );
+	var instructions = document.getElementById( 'instructions' );
+	var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
+	if ( havePointerLock ) {
+		console.log("chegou")
+		var pointerlockchange = function ( event ) {
+			if ( document.pointerLockElement === elementArea || document.mozPointerLockElement === elementArea || document.webkitPointerLockElement === elementArea ) {
+				controlsEnabled = true;
+				controls.enabled = true;
+				blocker.style.display = 'none';
+				console.log("chegou adasd")
 
+			} else {
+				controls.enabled = false;
+				blocker.style.display = 'block';
+				instructions.style.display = '';
+				console.log("chegolllllllllllllllllllllllllu")
+
+			}
+		};
+		var pointerlockerror = function ( event ) {
+			instructions.style.display = '';
+		};
+		// Hook pointer lock state change events
+		document.addEventListener( 'pointerlockchange', pointerlockchange, false );
+		document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
+		document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
+		document.addEventListener( 'pointerlockerror', pointerlockerror, false );
+		document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
+		document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
+		instructions.addEventListener( 'click', function ( event ) {
+			instructions.style.display = 'none';
+			// Ask the browser to lock the pointer
+			elementArea.requestPointerLock = elementArea.requestPointerLock || elementArea.mozRequestPointerLock || elementArea.webkitRequestPointerLock;
+			elementArea.requestPointerLock();
+		}, false );
+	} else {
+		instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
+	}
+
+}
 /************************************Inicio init***********************/
 function init() {
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize(window.innerWidth, window.innerHeight);
-	var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
+	elementArea = document.getElementById("area");
+	
 	dataGui = new dat.GUI();
 	var elementDataGui = dataGui.domElement.offsetParent;
 
-
-	document.getElementById("area").append(renderer.domElement);
-	document.getElementById("area").appendChild(elementDataGui);
-
+	elementArea.append(renderer.domElement);
+	elementArea.appendChild(elementDataGui);
 	scene = new THREE.Scene();
 
-	console.log("asdasdasdasdasd");
 
 	scene.background = new THREE.Color( 0xffffff );
 
 	// Setup the camera
 	camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 200000);
-	camera.position.set(player.width, player.height, -172);
-	camera.lookAt(new THREE.Vector3(player.width, player.height, 0));
+	//camera.position.set(player.width, player.height, -172);
+	//camera.lookAt(new THREE.Vector3(player.width, player.height, 0));
 
+	controls = new THREE.PointerLockControls(camera);
+	
+	scene.add( controls.getObject());
+	console.log('ola mundo', controls.getObject());
 	// Add the lights 
 	var light = new THREE.HemisphereLight( 0xffffff, 0xffffff, 1 );          
 	light.position.set( -120, 80, 40 );
 	scene.add( light );
 
-
+/*
 	function keyDown(event){
 		keyboard[event.keyCode] = true;
 	}
@@ -114,81 +175,146 @@ function init() {
 	}
 
 	window.addEventListener('keydown', keyDown);
-	window.addEventListener('keyup', keyUp);
+	window.addEventListener('keyup', keyUp);*/
 
-}
-/************************************Fim init***********************/
+	var onKeyDown = function ( event ) {
+
+		switch ( event.keyCode ) {
+
+			// case 38: // up
+			case 87: // w
+			moveForward = true;
+			break;
+
+			// case 37: // left
+			case 65: // a
+			moveLeft = true; break;
+
+			// case 40: // down
+			case 83: // s
+			moveBackward = true;
+			break;
+
+			// case 39: // right
+			case 68: // d
+			moveRight = true;
+			break;
+
+			// case 32: // space
+			// if ( canJump === true ) velocity.y += 350;
+			// canJump = false;
+			// break;
+
+			}
+
+		};
+
+		var onKeyUp = function ( event ) {
+
+			switch( event.keyCode ) {
+
+				// case 38: // up
+				case 87: // w
+				moveForward = false;
+				break;
+
+				// case 37: // left
+				case 65: // a
+				moveLeft = false;
+				break;
+
+				// case 40: // down
+				case 83: // s
+				moveBackward = false;
+				break;
+
+				// case 39: // right
+				case 68: // d
+				moveRight = false;
+				break;
+
+			}
+
+		};
+
+		document.addEventListener( 'keydown', onKeyDown, false );
+		document.addEventListener( 'keyup', onKeyUp, false );						
 
 
-/************************************Inicio guiData***********************/
-function guiData() {
-	options = {
-		navigation:{
-			speed: 1.8,
-			turnSpeed:Math.PI*0.02, 
-			autoNavigation: false
-		},
-		audio: {
-			volume: 0.5,
-			mute: false
-		},
-		reset: function() {
-			this.audio.volume = 0.5;
-			this.audio.mute = false;
-			this.navigation.speed = 1.8;
-			this.navigation.turnSpeed = Math.PI*0.005;
-			this.autoNavigation = false;
-		}
-	}
-
-	var audio =  dataGui.addFolder("Son");
-	audio.add(options.audio, 'volume', 0, 1).onChange(function(){
-		sound.setVolume(options.audio.volume);
-	}).listen();
-	audio.add(options.audio, 'mute').onChange(function(){
-		if (sound.isPlaying) {
-			sound.stop();
-		}else{
-			sound.play();
-		}
-	}).listen();
-	audio.open();
-
-	var navigation = dataGui.addFolder("Navigation");
-	navigation.add(options.navigation, 'speed', 0.5, 20).onChange(function(){
-		player.speed = options.navigation.speed;
-	}).listen();
-	navigation.add(options.navigation, 'turnSpeed', 0, 0.1, 0.001).onChange(function(){
-		player.turnSpeed = Math.PI*options.navigation.turnSpeed;
-	}).listen();
-	navigation.open();
-	navigation.add(options.navigation, 'autoNavigation').onChange(function(){
-		if (isActiveAuto === true ) {
-			console.log("Disabled auto navigation");
-			isActiveAuto = false;
-		}else{
-			console.log("Activated auto navigation");
-			isActiveAuto = true;
-		}
-	}).listen();
-
-	dataGui.add(options, 'reset')
-}
-/************************************Fim guiData***********************/
+		raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
+			}
+			/************************************Fim init***********************/
 
 
-/************************************Inicio initMesshesFirstFase***********************/
-function initMesshesFirstFase() {
-	var casaA, casaB, terreno;
-	var arvore, arvore2, arvore3, arvore4, arbustos;
-	var barraca;
-	var max_displacement = 0.2;
-	var scale = 2;
-	const manager = initLoadingManager();
-	const loader = new THREE.JSONLoader(manager);
-	var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
+			/************************************Inicio guiData***********************/
+			function guiData() {
+				options = {
+					navigation:{
+						speed: 1.8,
+						turnSpeed:Math.PI*0.02, 
+						autoNavigation: false
+					},
+					audio: {
+						volume: 0.5,
+						mute: false
+					},
+					reset: function() {
+						this.audio.volume = 0.5;
+						this.audio.mute = false;
+						this.navigation.speed = 1.8;
+						this.navigation.turnSpeed = Math.PI*0.005;
+						this.autoNavigation = false;
+					}
+				}
 
-	loader.load( "../src/models/buildA.json", addModelToScene, manager.onProgress, manager.onError);
+				var audio =  dataGui.addFolder("Son");
+				audio.add(options.audio, 'volume', 0, 1).onChange(function(){
+					sound.setVolume(options.audio.volume);
+				}).listen();
+				audio.add(options.audio, 'mute').onChange(function(){
+					if (sound.isPlaying) {
+						sound.stop();
+					}else{
+						sound.play();
+					}
+				}).listen();
+				audio.open();
+
+				var navigation = dataGui.addFolder("Navigation");
+				navigation.add(options.navigation, 'speed', 0.5, 20).onChange(function(){
+					player.speed = options.navigation.speed;
+				}).listen();
+				navigation.add(options.navigation, 'turnSpeed', 0, 0.1, 0.001).onChange(function(){
+					player.turnSpeed = Math.PI*options.navigation.turnSpeed;
+				}).listen();
+				navigation.open();
+				navigation.add(options.navigation, 'autoNavigation').onChange(function(){
+					if (isActiveAuto === true ) {
+						console.log("Disabled auto navigation");
+						isActiveAuto = false;
+					}else{
+						console.log("Activated auto navigation");
+						isActiveAuto = true;
+					}
+				}).listen();
+
+				dataGui.add(options, 'reset')
+			}
+			/************************************Fim guiData***********************/
+
+
+			/************************************Inicio initMesshesFirstFase***********************/
+			function initMesshesFirstFase() {
+				var casaA, casaB, terreno;
+				var arvore, arvore2, arvore3, arvore4, arbustos;
+				var barraca;
+				var max_displacement = 0.2;
+				var scale = 2;
+				const manager = initLoadingManager();
+				const loader = new THREE.JSONLoader(manager);
+				var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
+
+				loader.load( "../src/models/buildA.json", addModelToScene, manager.onProgress, manager.onError);
 	// After loading JSON from our file, we add it to the scene
 	function addModelToScene( geometry, materials ) {
 		var casaA = new THREE.Mesh( geometry, materials );
@@ -312,7 +438,50 @@ function initTexture(manager) {
 
 /************************************Inicio animate***********************/
 function animate() {
-	detectColision();
+	if ( controlsEnabled === true ) {
+
+		// raycaster.ray.origin.copy( controls.getObject().position );
+		// raycaster.ray.origin.y -= 10;
+
+		// var intersections = raycaster.intersectObjects( objects );
+
+
+
+		var time = performance.now();
+		var delta = ( time - prevTime ) / 1000;
+
+		velocity.x -= velocity.x * 5.0 * delta;
+		velocity.z -= velocity.z * 5.0 * delta;
+
+				
+
+					direction.z = Number( moveForward ) - Number( moveBackward );
+					direction.x = Number( moveLeft ) - Number( moveRight );
+					direction.normalize(); // this ensures consistent movements in all directions
+
+					if ( moveForward || moveBackward ) velocity.z -= direction.z * 500.0 * delta;
+					if ( moveLeft || moveRight ) velocity.x -= direction.x * 500.0 * delta;
+
+			
+
+					controls.getObject().translateX( velocity.x * delta );
+					controls.getObject().translateY( velocity.y * delta );
+					controls.getObject().translateZ( velocity.z * delta );
+
+					if ( controls.getObject().position.y < 10 ) {
+
+						velocity.y = 0;
+						controls.getObject().position.y = 10;
+
+						canJump = true;
+
+					}
+
+					prevTime = time;
+
+				}
+
+	// detectColision();
 	requestAnimationFrame( animate );	
 	renderer.render(scene, camera);
 
@@ -357,7 +526,7 @@ function detectColision() {
 	var prev_pos_x = camera.position.x;
 	var prev_pos_z = camera.position.z;
 	player.mesh = new THREE.Object3D();
-	listenControls();
+	//listenControls();
 	player.rays = [
 	new THREE.Vector3(0, 0, 1),
 	new THREE.Vector3(1, 0, 1),
@@ -477,10 +646,11 @@ function IsFullScreenCurrently() {
 
 
 if (fase == 1) {
+	pointerLock();
 	init();
 	initMesshesFirstFase();
 	animate();
-	console.log("entrou");
+	
 }else if (fase == 2 ) {
 	alert("A função: initMesshesSecondFase() falta implementar");
 	// init();

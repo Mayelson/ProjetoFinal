@@ -34,6 +34,17 @@
 			</div>
 		</div>
 	</div>
+
+	<div id="blocker">
+
+			<div id="instructions">
+				<span style="font-size:40px">Click to play</span>
+				<br />
+				(W, A, S, D = Move, SPACE = Jump, MOUSE = Look around)
+			</div>
+
+		</div>
+
 	<div id="area">
 		<div id="btnInfoFull">
 			<button id="btnInfo"  data-toggle="tooltip" data-placement="top" title="Informações" class="fas fa-info" onclick="eventInfo()"></button>
@@ -58,7 +69,8 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/87/three.min.js"></script>
 	<script src="./src/js/Detector.js"></script>
 	<script src='./src/js/dat.gui.min.js'></script>
-
+	    
+      <script src="src/js/PointerLockControls.js"></script> 
 	<!-- script para fazer o rendering do area do navegação/ -->
 	<script type="text/javascript" src="../src/RenderThree.js" ></script>
 </body>
@@ -142,6 +154,8 @@
 		bottom: 40px;
 		right: 0px;
 	}
+
+
 	#btnFullScreen{
 		position: absolute;
 	}
@@ -153,5 +167,30 @@
 	}
 	#btnInfoFull{
 		position: absolute;
+	}
+	#instructions {
+		width: 100%;
+		height: 100%;
+		display: -webkit-box;
+		display: -moz-box;
+		display: box;
+		-webkit-box-orient: horizontal;
+		-moz-box-orient: horizontal;
+		box-orient: horizontal;
+		-webkit-box-pack: center;
+		-moz-box-pack: center;
+		box-pack: center;
+		-webkit-box-align: center;
+		-moz-box-align: center;
+		box-align: center;
+		color: #ffffff;
+		text-align: center;
+		cursor: pointer;
+	}
+	#blocker {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0,0,0,0.5);
 	}
 </style>
