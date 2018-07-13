@@ -241,7 +241,7 @@ function init() {
 		document.addEventListener( 'keyup', onKeyUp, false );						
 
 
-		raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
+		//raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
 			}
 			/************************************Fim init***********************/
 
@@ -438,13 +438,18 @@ function initTexture(manager) {
 
 /************************************Inicio animate***********************/
 function animate() {
-	if ( controlsEnabled === true ) {
+	
 
-		// raycaster.ray.origin.copy( controls.getObject().position );
-		// raycaster.ray.origin.y -= 10;
+	detectColision();
+	requestAnimationFrame( animate );	
+	renderer.render(scene, camera);
 
-		// var intersections = raycaster.intersectObjects( objects );
+}
+/************************************Fim animate***********************/
 
+
+/************************************Inicio controls***********************/
+function listenControls(key) {
 
 
 		var time = performance.now();
@@ -453,7 +458,7 @@ function animate() {
 		velocity.x -= velocity.x * 5.0 * delta;
 		velocity.z -= velocity.z * 5.0 * delta;
 
-				
+		
 
 					direction.z = Number( moveForward ) - Number( moveBackward );
 					direction.x = Number( moveLeft ) - Number( moveRight );
@@ -478,20 +483,7 @@ function animate() {
 					}
 
 					prevTime = time;
-
-				}
-
-	// detectColision();
-	requestAnimationFrame( animate );	
-	renderer.render(scene, camera);
-
-}
-/************************************Fim animate***********************/
-
-
-/************************************Inicio controls***********************/
-function listenControls(key) {
-	if(keyboard[87] || key == 87){ // W key
+	/*if(keyboard[87] || key == 87){ // W key
 	//   if (camera.position.z < 281) {		
 		camera.position.x -= Math.sin(camera.rotation.y) * player.speed;
 		camera.position.z -= -Math.cos(camera.rotation.y) * player.speed;
@@ -516,17 +508,17 @@ function listenControls(key) {
 	}
 	if(keyboard[39] || key == 39){ // right arrow key
 		camera.rotation.y += player.turnSpeed;
-	}
+	}*/
 }
 /************************************Fim controls***********************/
 
 
 /************************************Inicio detectColision***********************/
 function detectColision() {
-	var prev_pos_x = camera.position.x;
-	var prev_pos_z = camera.position.z;
+	var prev_pos_x = controls.getObject().position.x;
+	var prev_pos_z = controls.getObject().position.z;
 	player.mesh = new THREE.Object3D();
-	//listenControls();
+	listenControls();
 	player.rays = [
 	new THREE.Vector3(0, 0, 1),
 	new THREE.Vector3(1, 0, 1),
@@ -540,28 +532,30 @@ function detectColision() {
 
 	player.raycaster = new THREE.Raycaster();
 	var i, collisions;
-	if((camera.position.x > 660 && camera.position.x < 670) || (camera.position.x < -694 && camera.position.x > - 704) || (camera.position.z > 850 && camera.position.z < 950 ) || (camera.position.z < -850 && camera.position.z > -950) ){
+	if((controls.getObject().position.x > 660 && controls.getObject().position.x < 670) || (controls.getObject().position.x < -694 && controls.getObject().position.x > - 704) || (controls.getObject().position.z > 850 && controls.getObject().position.z < 950 ) || (controls.getObject().position.z < -850 && controls.getObject().positionn.z > -950) ){
 		
-		prev_pos_x = camera.position.x;
-		prev_pos_z = camera.position.z;
+		prev_pos_x = controls.getObject().position.x;
+		prev_pos_z = controls.getObject().position.z;
 	}
-	if(camera.position.x > 670 || camera.position.x < -704 || camera.position.z > 950 || camera.position.z < -950 ){
+	if(controls.getObject().position.x > 670 || controls.getObject().position.x < -704 || controls.getObject().position.z > 950 || controls.getObject().position.z < -950 ){
 		
-		camera.position.x = prev_pos_x;
-		camera.position.z = prev_pos_z;
+		controls.getObject().position.x = prev_pos_x;
+		controls.getObject().position.z = prev_pos_z;
 	}
 	
 	for(i = 0; i<player.rays.length; i++){
-		player.raycaster.set(camera.position, player.rays[i] );
+		player.raycaster.set(controls.getObject().position, player.rays[i] );
 		collisions = player.raycaster.intersectObjects(objects);
 		if(collisions.length > 0){
+			
 			if(collisions[0].distance > 4 && collisions[0].distance < 10){
-				prev_pos_x = camera.position.x;
-				prev_pos_z = camera.position.z;
+				prev_pos_x = controls.getObject().position.x;
+				prev_pos_z = controls.getObject().position.z;
 			}
 			if(collisions[0].distance < 3){
-				camera.position.x = prev_pos_x;
-				camera.position.z = prev_pos_z;
+
+				controls.getObject().position.x = prev_pos_x;
+				controls.getObject().position.z = prev_pos_z;
 			}
 		}
 	}
