@@ -9,11 +9,11 @@ let areaHeight = 510;
 var keyboard = {};
 var objects = [];
 var valuesForReturns = {}; 
-var player = { width:60, height:8, speed:1.8, turnSpeed:Math.PI*0.005 };
+var player = { width:60, height:8, speed: 0.2, turnSpeed:Math.PI*0.005 };
 var options = null;
 var isActiveAuto = false;
 var elementArea = null;
-
+var controlsButtons = false;
 
 var raycaster;
 var moveForward = false;
@@ -27,7 +27,7 @@ var velocity = new THREE.Vector3();
 var direction = new THREE.Vector3();
 var vertex = new THREE.Vector3();
 var color = new THREE.Color();
-var controlsEnabled = false;
+
 /************************************Inicio initLoadingManager***********************/
 function initLoadingManager() {
 
@@ -76,9 +76,11 @@ function initLoadingManager() {
 	    cancelAnimationFrame( frameID );
 	    var duracao = (Date.now() - tempoInicial)/1000;
 	    console.log("Demorou" + " " + duracao + " " +"segundos"+" " + "a ser carregado");
-	    
-	    initAudio();
-	    guiData();
+
+	    var blocker = document.getElementById( 'blocker' );
+	    blocker.style.display = "block";
+	    // initAudio();
+	    // guiData();
 	    
 	};
 
@@ -98,20 +100,19 @@ function pointerLock(){
 	var instructions = document.getElementById( 'instructions' );
 	var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
 	if ( havePointerLock ) {
-		console.log("chegou")
+
 		var pointerlockchange = function ( event ) {
 			if ( document.pointerLockElement === elementArea || document.mozPointerLockElement === elementArea || document.webkitPointerLockElement === elementArea ) {
-				controlsEnabled = true;
 				controls.enabled = true;
 				blocker.style.display = 'none';
-				console.log("chegou adasd")
+				initAudio();
+				guiData();
 
 			} else {
 				controls.enabled = false;
 				blocker.style.display = 'block';
 				instructions.style.display = '';
-				console.log("chegolllllllllllllllllllllllllu")
-
+				
 			}
 		};
 		var pointerlockerror = function ( event ) {
@@ -177,27 +178,36 @@ function init() {
 	window.addEventListener('keydown', keyDown);
 	window.addEventListener('keyup', keyUp);*/
 
-	var onKeyDown = function ( event ) {
+	
+
+	document.addEventListener( 'keydown', onKeyDown, false );
+	document.addEventListener( 'keyup', onKeyUp, false );						
+
+
+		//raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
+	}
+	/************************************Fim init***********************/
+	function onKeyDown( event ) {
 
 		switch ( event.keyCode ) {
 
 			// case 38: // up
 			case 87: // w
-			moveForward = true;
+			return moveForward = true;
 			break;
 
 			// case 37: // left
 			case 65: // a
-			moveLeft = true; break;
+			return moveLeft = true; break;
 
 			// case 40: // down
 			case 83: // s
-			moveBackward = true;
+			return moveBackward = true;
 			break;
 
 			// case 39: // right
 			case 68: // d
-			moveRight = true;
+			return moveRight = true;
 			break;
 
 			// case 32: // space
@@ -205,116 +215,122 @@ function init() {
 			// canJump = false;
 			// break;
 
-			}
+		}
 
-		};
+	};
 
-		var onKeyUp = function ( event ) {
+	function onKeyUp( event ) {
 
-			switch( event.keyCode ) {
+		switch( event.keyCode ) {
 
 				// case 38: // up
 				case 87: // w
-				moveForward = false;
+				return	moveForward = false;
 				break;
 
 				// case 37: // left
 				case 65: // a
-				moveLeft = false;
+				return	moveLeft = false;
 				break;
 
 				// case 40: // down
 				case 83: // s
-				moveBackward = false;
+				return moveBackward = false;
 				break;
 
 				// case 39: // right
 				case 68: // d
-				moveRight = false;
+				return moveRight = false;
 				break;
 
 			}
 
 		};
 
-		document.addEventListener( 'keydown', onKeyDown, false );
-		document.addEventListener( 'keyup', onKeyUp, false );						
-
-
-		//raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
-			}
-			/************************************Fim init***********************/
-
-
-			/************************************Inicio guiData***********************/
-			function guiData() {
-				options = {
-					navigation:{
-						speed: 1.8,
-						turnSpeed:Math.PI*0.02, 
-						autoNavigation: false
-					},
-					audio: {
-						volume: 0.5,
-						mute: false
-					},
-					reset: function() {
-						this.audio.volume = 0.5;
-						this.audio.mute = false;
-						this.navigation.speed = 1.8;
-						this.navigation.turnSpeed = Math.PI*0.005;
-						this.autoNavigation = false;
-					}
+		/************************************Inicio guiData***********************/
+		function guiData() {
+			var navegationButtonsElement = document.getElementById("btnNavigationWalk");
+			var blocker = document.getElementById( 'blocker' );
+			options = {
+				navigation:{
+					speed: 0.2, 
+					autoNavigation: false,
+					controlsButtons: false
+				},
+				audio: {
+					volume: 0.5,
+					mute: false
+				},
+				reset: function() {
+					this.audio.volume = 0.2;
+					this.audio.mute = false;
+					this.navigation.speed = 300;
+					this.autoNavigation = false;
+					this.controlsButtons = false;
 				}
-
-				var audio =  dataGui.addFolder("Son");
-				audio.add(options.audio, 'volume', 0, 1).onChange(function(){
-					sound.setVolume(options.audio.volume);
-				}).listen();
-				audio.add(options.audio, 'mute').onChange(function(){
-					if (sound.isPlaying) {
-						sound.stop();
-					}else{
-						sound.play();
-					}
-				}).listen();
-				audio.open();
-
-				var navigation = dataGui.addFolder("Navigation");
-				navigation.add(options.navigation, 'speed', 0.5, 20).onChange(function(){
-					player.speed = options.navigation.speed;
-				}).listen();
-				navigation.add(options.navigation, 'turnSpeed', 0, 0.1, 0.001).onChange(function(){
-					player.turnSpeed = Math.PI*options.navigation.turnSpeed;
-				}).listen();
-				navigation.open();
-				navigation.add(options.navigation, 'autoNavigation').onChange(function(){
-					if (isActiveAuto === true ) {
-						console.log("Disabled auto navigation");
-						isActiveAuto = false;
-					}else{
-						console.log("Activated auto navigation");
-						isActiveAuto = true;
-					}
-				}).listen();
-
-				dataGui.add(options, 'reset')
 			}
-			/************************************Fim guiData***********************/
+
+			var audio =  dataGui.addFolder("Son");
+			audio.add(options.audio, 'volume', 0, 1).onChange(function(){
+				sound.setVolume(options.audio.volume);
+			}).listen();
+			audio.add(options.audio, 'mute').onChange(function(){
+				if (sound.isPlaying) {
+					sound.stop();
+				}else{
+					sound.play();
+				}
+			}).listen();
+			audio.open();
+
+			var navigation = dataGui.addFolder("Navigation");
+			navigation.add(options.navigation, 'speed', 0.1, 1).onChange(function(){
+				player.speed = options.navigation.speed;
+			}).listen();
+			navigation.add(options.navigation, 'controlsButtons').onChange(function(){
+				if (controlsButtons === true ) {
+					console.log("Disabled controls");
+					navegationButtonsElement.style.display = "none";
+					blocker.style.display = "block";
+					controlsButtons = false;
+
+				}else{
+
+					console.log("Activated controls");
+					navegationButtonsElement.style.display = "block";
+				    blocker.style.display = "none";
+				    controls.enabled = false;
+					controlsButtons = true;
+				}
+			}).listen();
+			navigation.open();
+			navigation.add(options.navigation, 'autoNavigation').onChange(function(){
+				if (isActiveAuto === true ) {
+					console.log("Disabled auto navigation");
+					isActiveAuto = false;
+				}else{
+					console.log("Activated auto navigation");
+					isActiveAuto = true;
+				}
+			}).listen();
+
+			dataGui.add(options, 'reset')
+		}
+		/************************************Fim guiData***********************/
 
 
-			/************************************Inicio initMesshesFirstFase***********************/
-			function initMesshesFirstFase() {
-				var casaA, casaB, terreno;
-				var arvore, arvore2, arvore3, arvore4, arbustos;
-				var barraca;
-				var max_displacement = 0.2;
-				var scale = 2;
-				const manager = initLoadingManager();
-				const loader = new THREE.JSONLoader(manager);
-				var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
+		/************************************Inicio initMesshesFirstFase***********************/
+		function initMesshesFirstFase() {
+			var casaA, casaB, terreno;
+			var arvore, arvore2, arvore3, arvore4, arbustos;
+			var barraca;
+			var max_displacement = 0.2;
+			var scale = 2;
+			const manager = initLoadingManager();
+			const loader = new THREE.JSONLoader(manager);
+			var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
 
-				loader.load( "../src/models/buildA.json", addModelToScene, manager.onProgress, manager.onError);
+			loader.load( "../src/models/buildA.json", addModelToScene, manager.onProgress, manager.onError);
 	// After loading JSON from our file, we add it to the scene
 	function addModelToScene( geometry, materials ) {
 		var casaA = new THREE.Mesh( geometry, materials );
@@ -439,7 +455,6 @@ function initTexture(manager) {
 /************************************Inicio animate***********************/
 function animate() {
 	
-
 	detectColision();
 	requestAnimationFrame( animate );	
 	renderer.render(scene, camera);
@@ -452,22 +467,23 @@ function animate() {
 function listenControls(key) {
 
 
-		var time = performance.now();
-		var delta = ( time - prevTime ) / 1000;
+	var time = performance.now();
+	var delta = ( time - prevTime ) / 1000;
 
-		velocity.x -= velocity.x * 5.0 * delta;
-		velocity.z -= velocity.z * 5.0 * delta;
+	velocity.x -= velocity.x * 5.0 * delta;
+	velocity.z -= velocity.z * 5.0 * delta;
 
-		
 
-					direction.z = Number( moveForward ) - Number( moveBackward );
-					direction.x = Number( moveLeft ) - Number( moveRight );
+
+	direction.z = Number( moveForward ) - Number( moveBackward );
+	direction.x = Number( moveLeft ) - Number( moveRight );
 					direction.normalize(); // this ensures consistent movements in all directions
 
-					if ( moveForward || moveBackward ) velocity.z -= direction.z * 500.0 * delta;
-					if ( moveLeft || moveRight ) velocity.x -= direction.x * 500.0 * delta;
+					//para a normalizar colocamos o player.speed entre 0 e 1 e temos que multiplicar por 2000 == valor Max
+					if ( moveForward || moveBackward ) velocity.z -= direction.z * player.speed * 2000 * delta;
+					if ( moveLeft || moveRight ) velocity.x -= direction.x * player.speed * 2000 * delta; 
 
-			
+
 
 					controls.getObject().translateX( velocity.x * delta );
 					controls.getObject().translateY( velocity.y * delta );
@@ -483,87 +499,73 @@ function listenControls(key) {
 					}
 
 					prevTime = time;
-	/*if(keyboard[87] || key == 87){ // W key
-	//   if (camera.position.z < 281) {		
-		camera.position.x -= Math.sin(camera.rotation.y) * player.speed;
-		camera.position.z -= -Math.cos(camera.rotation.y) * player.speed;
-	 //console.log("x", camera.position);
-	}
-	if(keyboard[83] || key == 83){ // S key
 
-		camera.position.x += Math.sin(camera.rotation.y) * player.speed;
-		camera.position.z += -Math.cos(camera.rotation.y) * player.speed;
-	}
-	if(keyboard[65] || key == 63){ // A key
-		camera.position.x += Math.sin(camera.rotation.y + Math.PI/2) * player.speed;
-		camera.position.z += -Math.cos(camera.rotation.y + Math.PI/2) * player.speed;
-	}
-	if(keyboard[68] || key == 68){ // D key
-		camera.position.x += Math.sin(camera.rotation.y - Math.PI/2) * player.speed;
-		camera.position.z += -Math.cos(camera.rotation.y - Math.PI/2) * player.speed;
-	}
+				}
+				/************************************Fim controls***********************/
+				function eventWalk(key){
 
-	if(keyboard[37] || key == 37){ // left arrow key
-		camera.rotation.y -= player.turnSpeed;
-	}
-	if(keyboard[39] || key == 39){ // right arrow key
-		camera.rotation.y += player.turnSpeed;
-	}*/
-}
-/************************************Fim controls***********************/
+					var event = { keyCode: key}
+					onKeyDown(event);
+				
+				}
 
 
-/************************************Inicio detectColision***********************/
-function detectColision() {
-	var prev_pos_x = controls.getObject().position.x;
-	var prev_pos_z = controls.getObject().position.z;
-	player.mesh = new THREE.Object3D();
-	listenControls();
-	player.rays = [
-	new THREE.Vector3(0, 0, 1),
-	new THREE.Vector3(1, 0, 1),
-	new THREE.Vector3(1, 0, 0),
-	new THREE.Vector3(1, 0, -1),
-	new THREE.Vector3(0, 0, -1),
-	new THREE.Vector3(-1, 0, -1),
-	new THREE.Vector3(-1, 0, 0),
-	new THREE.Vector3(-1, 0, 1)
-	];
+				function eventWalkStop(key){
+						var event = { keyCode: key}
+						onKeyDown(event);
+					
+				}
+				/************************************Inicio detectColision***********************/
+				function detectColision() {
+					var prev_pos_x = controls.getObject().position.x;
+					var prev_pos_z = controls.getObject().position.z;
+					player.mesh = new THREE.Object3D();
+					listenControls();
+					player.rays = [
+					new THREE.Vector3(0, 0, 1),
+					new THREE.Vector3(1, 0, 1),
+					new THREE.Vector3(1, 0, 0),
+					new THREE.Vector3(1, 0, -1),
+					new THREE.Vector3(0, 0, -1),
+					new THREE.Vector3(-1, 0, -1),
+					new THREE.Vector3(-1, 0, 0),
+					new THREE.Vector3(-1, 0, 1)
+					];
 
-	player.raycaster = new THREE.Raycaster();
-	var i, collisions;
-	if((controls.getObject().position.x > 660 && controls.getObject().position.x < 670) || (controls.getObject().position.x < -694 && controls.getObject().position.x > - 704) || (controls.getObject().position.z > 850 && controls.getObject().position.z < 950 ) || (controls.getObject().position.z < -850 && controls.getObject().positionn.z > -950) ){
-		
-		prev_pos_x = controls.getObject().position.x;
-		prev_pos_z = controls.getObject().position.z;
-	}
-	if(controls.getObject().position.x > 670 || controls.getObject().position.x < -704 || controls.getObject().position.z > 950 || controls.getObject().position.z < -950 ){
-		
-		controls.getObject().position.x = prev_pos_x;
-		controls.getObject().position.z = prev_pos_z;
-	}
-	
-	for(i = 0; i<player.rays.length; i++){
-		player.raycaster.set(controls.getObject().position, player.rays[i] );
-		collisions = player.raycaster.intersectObjects(objects);
-		if(collisions.length > 0){
-			
-			if(collisions[0].distance > 4 && collisions[0].distance < 10){
-				prev_pos_x = controls.getObject().position.x;
-				prev_pos_z = controls.getObject().position.z;
-			}
-			if(collisions[0].distance < 3){
+					player.raycaster = new THREE.Raycaster();
+					var i, collisions;
+					if((controls.getObject().position.x > 660 && controls.getObject().position.x < 670) || (controls.getObject().position.x < -694 && controls.getObject().position.x > - 704) || (controls.getObject().position.z > 850 && controls.getObject().position.z < 950 ) || (controls.getObject().position.z < -850 && controls.getObject().position.z > -950) ){
 
-				controls.getObject().position.x = prev_pos_x;
-				controls.getObject().position.z = prev_pos_z;
-			}
-		}
-	}
-}
-/************************************Fim detectColision***********************/
+						prev_pos_x = controls.getObject().position.x;
+						prev_pos_z = controls.getObject().position.z;
+					}
+					if(controls.getObject().position.x > 670 || controls.getObject().position.x < -704 || controls.getObject().position.z > 950 || controls.getObject().position.z < -950 ){
 
-/************************************Inicio initAudio***********************/
-function initAudio(){
+						controls.getObject().position.x = prev_pos_x;
+						controls.getObject().position.z = prev_pos_z;
+					}
+
+					for(i = 0; i<player.rays.length; i++){
+						player.raycaster.set(controls.getObject().position, player.rays[i] );
+						collisions = player.raycaster.intersectObjects(objects);
+						if(collisions.length > 0){
+
+							if(collisions[0].distance > 4 && collisions[0].distance < 10){
+								prev_pos_x = controls.getObject().position.x;
+								prev_pos_z = controls.getObject().position.z;
+							}
+							if(collisions[0].distance < 3){
+
+								controls.getObject().position.x = prev_pos_x;
+								controls.getObject().position.z = prev_pos_z;
+							}
+						}
+					}
+				}
+				/************************************Fim detectColision***********************/
+
+				/************************************Inicio initAudio***********************/
+				function initAudio(){
 	// create an AudioListener and add it to the camera
 	var listener = new THREE.AudioListener();
 	camera.add( listener );
