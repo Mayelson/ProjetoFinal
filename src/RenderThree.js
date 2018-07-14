@@ -20,7 +20,6 @@ var moveForward = false;
 var moveBackward = false;
 var moveLeft = false;
 var moveRight = false;
-var canJump = false;
 
 var prevTime = performance.now();
 var velocity = new THREE.Vector3();
@@ -35,12 +34,9 @@ function initLoadingManager() {
 	const progressBar = document.getElementById("progressBar");
 	const loadingOverlay = document.getElementById("progressBarContainer");
 	const texProgressBar = document.getElementById("texProgressBar");
-
 	let percentComplete = 1;
 	let frameID = null;
-
  	const updateAmount = 5; // in percent of bar width, should divide 100 evenly
- 	
  	var tempoInicial = Date.now();
  	
  	const animateBar = () => {
@@ -51,10 +47,8 @@ function initLoadingManager() {
 	    	// progressBar.style.backgroundColor = 'green'
 	    	percentComplete = 1;
 	    }
-
 	    progressBar.style.width = percentComplete + '%';
 	    texProgressBar.innerHTML = percentComplete + "%";
-
 	    frameID = requestAnimationFrame( animateBar )
 	}
 	// enquanto carrega os modelos executa esta funcao
@@ -79,18 +73,15 @@ function initLoadingManager() {
 
 	    var blocker = document.getElementById( 'blocker' );
 	    blocker.style.display = "block";
-	    // initAudio();
-	    // guiData();
+	    initAudio();
+		guiData();
 	    
 	};
-
 	manager.onError = function ( e ) { 
 
 		console.error( e ); 
 		progressBar.style.backgroundColor = 'red';
-
 	}
-
 	return manager;
 }
 /************************************Fim initLoadingManager***********************/
@@ -105,14 +96,10 @@ function pointerLock(){
 			if ( document.pointerLockElement === elementArea || document.mozPointerLockElement === elementArea || document.webkitPointerLockElement === elementArea ) {
 				controls.enabled = true;
 				blocker.style.display = 'none';
-				initAudio();
-				guiData();
-
 			} else {
 				controls.enabled = false;
 				blocker.style.display = 'block';
 				instructions.style.display = '';
-				
 			}
 		};
 		var pointerlockerror = function ( event ) {
@@ -134,296 +121,258 @@ function pointerLock(){
 	} else {
 		instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
 	}
-
 }
+
 /************************************Inicio init***********************/
 function init() {
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	elementArea = document.getElementById("area");
+	elementArea.append(renderer.domElement);
 	
 	dataGui = new dat.GUI();
 	var elementDataGui = dataGui.domElement.offsetParent;
-
-	elementArea.append(renderer.domElement);
 	elementArea.appendChild(elementDataGui);
+
 	scene = new THREE.Scene();
-
-
 	scene.background = new THREE.Color( 0xffffff );
 
 	// Setup the camera
 	camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 200000);
 	//camera.position.set(player.width, player.height, -172);
 	//camera.lookAt(new THREE.Vector3(player.width, player.height, 0));
-
 	controls = new THREE.PointerLockControls(camera);
-	
 	scene.add( controls.getObject());
-	console.log('ola mundo', controls.getObject());
+
 	// Add the lights 
 	var light = new THREE.HemisphereLight( 0xffffff, 0xffffff, 1 );          
 	light.position.set( -120, 80, 40 );
 	scene.add( light );
 
-/*
-	function keyDown(event){
-		keyboard[event.keyCode] = true;
-	}
-
-	function keyUp(event){
-		keyboard[event.keyCode] = false;
-	}
-
-	window.addEventListener('keydown', keyDown);
-	window.addEventListener('keyup', keyUp);*/
-
-	
-
 	document.addEventListener( 'keydown', onKeyDown, false );
 	document.addEventListener( 'keyup', onKeyUp, false );						
-
-
-		//raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
-	}
-	/************************************Fim init***********************/
-	function onKeyDown( event ) {
-
-		switch ( event.keyCode ) {
-
-			// case 38: // up
-			case 87: // w
-			return moveForward = true;
-			break;
-
-			// case 37: // left
-			case 65: // a
-			return moveLeft = true; break;
-
-			// case 40: // down
-			case 83: // s
-			return moveBackward = true;
-			break;
-
-			// case 39: // right
-			case 68: // d
-			return moveRight = true;
-			break;
-
-			// case 32: // space
-			// if ( canJump === true ) velocity.y += 350;
-			// canJump = false;
-			// break;
-
-		}
-
-	};
-
-	function onKeyUp( event ) {
-
-		switch( event.keyCode ) {
-
-				// case 38: // up
-				case 87: // w
-				return	moveForward = false;
-				break;
-
-				// case 37: // left
-				case 65: // a
-				return	moveLeft = false;
-				break;
-
-				// case 40: // down
-				case 83: // s
-				return moveBackward = false;
-				break;
-
-				// case 39: // right
-				case 68: // d
-				return moveRight = false;
-				break;
-
-			}
-
-		};
-
-		/************************************Inicio guiData***********************/
-		function guiData() {
-			var navegationButtonsElement = document.getElementById("btnNavigationWalk");
-			var blocker = document.getElementById( 'blocker' );
-			options = {
-				navigation:{
-					speed: 0.2, 
-					autoNavigation: false,
-					controlsButtons: false
-				},
-				audio: {
-					volume: 0.5,
-					mute: false
-				},
-				reset: function() {
-					this.audio.volume = 0.2;
-					this.audio.mute = false;
-					this.navigation.speed = 300;
-					this.autoNavigation = false;
-					this.controlsButtons = false;
-				}
-			}
-
-			var audio =  dataGui.addFolder("Son");
-			audio.add(options.audio, 'volume', 0, 1).onChange(function(){
-				sound.setVolume(options.audio.volume);
-			}).listen();
-			audio.add(options.audio, 'mute').onChange(function(){
-				if (sound.isPlaying) {
-					sound.stop();
-				}else{
-					sound.play();
-				}
-			}).listen();
-			audio.open();
-
-			var navigation = dataGui.addFolder("Navigation");
-			navigation.add(options.navigation, 'speed', 0.1, 1).onChange(function(){
-				player.speed = options.navigation.speed;
-			}).listen();
-			navigation.add(options.navigation, 'controlsButtons').onChange(function(){
-				if (controlsButtons === true ) {
-					console.log("Disabled controls");
-					navegationButtonsElement.style.display = "none";
-					blocker.style.display = "block";
-					controlsButtons = false;
-
-				}else{
-
-					console.log("Activated controls");
-					navegationButtonsElement.style.display = "block";
-				    blocker.style.display = "none";
-				    controls.enabled = false;
-					controlsButtons = true;
-				}
-			}).listen();
-			navigation.open();
-			navigation.add(options.navigation, 'autoNavigation').onChange(function(){
-				if (isActiveAuto === true ) {
-					console.log("Disabled auto navigation");
-					isActiveAuto = false;
-				}else{
-					console.log("Activated auto navigation");
-					isActiveAuto = true;
-				}
-			}).listen();
-
-			dataGui.add(options, 'reset')
-		}
-		/************************************Fim guiData***********************/
-
-
-		/************************************Inicio initMesshesFirstFase***********************/
-		function initMesshesFirstFase() {
-			var casaA, casaB, terreno;
-			var arvore, arvore2, arvore3, arvore4, arbustos;
-			var barraca;
-			var max_displacement = 0.2;
-			var scale = 2;
-			const manager = initLoadingManager();
-			const loader = new THREE.JSONLoader(manager);
-			var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
-
-			loader.load( "../src/models/buildA.json", addModelToScene, manager.onProgress, manager.onError);
-	// After loading JSON from our file, we add it to the scene
-	function addModelToScene( geometry, materials ) {
-		var casaA = new THREE.Mesh( geometry, materials );
-		casaA.scale.set(40,40,40);
-		casaA.position.y = -40;
-		casaA.position.z = -20;
-		casaA.position.x = -210;
-		scene.add( casaA );
-		objects.push(casaA);
-	}
-
-	loader.load( "../src/models/buildB.json", addModelToScene2, manager.onProgress, manager.onError);
-	// After loading JSON from our file, we add it to the scene
-	function addModelToScene2( geometry, materials ) {
-		casaB = new THREE.Mesh( geometry, materials );
-		casaB.scale.set(40,40,40);
-		casaB.position.y = -40;
-		casaB.position.z = 0;
-		casaB.position.x = -220;
-		casaB.name = "casaB";
-		scene.add( casaB );
-		objects.push(casaB);
-	}
-
-	loader.load( "../src/models/gradient.json", addModelToScene3, manager.onProgress, manager.onError);
-	// After loading JSON from our file, we add it to the scene
-	function addModelToScene3( geometry, materials ) {
-		terreno = new THREE.Mesh( geometry, materials );
-		terreno.scale.set(20,20,20);
-		terreno.position.y = -40;
-		terreno.position.z = -500;
-		terreno.position.x = Math.PI/2;
-		scene.add( terreno );
-	}
-
-	loader.load( "../src/models/arbustosv3.json", addModelToScene5, manager.onProgress, manager.onError);
-	// After loading JSON from our file, we add it to the scene
-	function addModelToScene5( geometry, materials ) {
-		arbustos = new THREE.Mesh( geometry, materials );
-		arbustos.scale.set(0.3,0.3,0.3);
-		arbustos.position.y = -40;
-		arbustos.position.z = 100;
-		arbustos.position.x = -550;
-		scene.add( arbustos );
-	}
-
-	loader.load( "../src/models/sobreiro.json", addModelToScene12);
-	// After loading JSON from our file, we add it to the scene
-	function addModelToScene12( geometry, materials ) {
-		arvore4 = new THREE.Mesh( geometry, materials );
-		arvore4.scale.set(30,30,30)
-		arvore4.position.y = -40;
-		arvore4.position.z = -200;
-		arvore4.position.x = -500;
-		arvore4.name = "sobreiro";
-		var arvore5 = arvore4.clone();
-		arvore5.scale.set(40,40,40)
-		arvore5.position.y = -40;
-		arvore5.position.z = -500;
-		arvore5.position.x = -300;
-		scene.add( arvore4 );
-		scene.add( arvore5 );
-		objects.push(arvore4);
-		objects.push(arvore5);
-	}
-
-	loader.load( "../src/models/barraca.json", addModelToScene13, manager.onProgress, manager.onError);
-	// After loading JSON from our file, we add it to the scene
-	function addModelToScene13( geometry, materials ) {
-		barraca = new THREE.Mesh( geometry, materials );
-		barraca.scale.set(40,40,40)
-		barraca.position.y = -40;
-		barraca.position.z = -400;
-		barraca.position.x = -500;
-		scene.add( barraca );
-	}
-	initTexture(manager); 
-	// //Load Textures
-	// var imagePrefix = "../src/img/mirobriga/panoramica/";
-	// var directions = ["posx","negx","","","posz","negz"];
-	// var imageSuffix = ".jpg";
-	// var cubeMaterials = [];
-	// for(var i = 0; i < 6; i++ )
-	// 	cubeMaterials.push(new THREE.MeshBasicMaterial({
-	// 		map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix),
-	// 		side: THREE.BackSide
-	// 	}));
-	// var cube = new THREE.Mesh( geometry, cubeMaterials );
-	// cube.position.set(50000,59000,0);
-	// scene.add( cube );
-	// cube.rotation.y=9;
 }
-/************************************Fim initMesshesFirstFase***********************/
+/************************************Fim init***********************/
+
+function onKeyDown( event ) {
+	switch ( event.keyCode ) {
+		// case 38: // up
+		case 87: // w
+			return moveForward = true;
+		break;
+		// case 37: // left
+		case 65: // a
+			return moveLeft = true;
+		break;
+		// case 40: // down
+		case 83: // s
+			return moveBackward = true;
+		break;
+		// case 39: // right
+		case 68: // d
+			return moveRight = true;
+		break;
+	}
+}
+
+function onKeyUp( event ) {
+	switch( event.keyCode ) {
+		// case 38: // up
+		case 87: // w
+			return	moveForward = false;
+		break;
+		// case 37: // left
+		case 65: // a
+			return	moveLeft = false;
+		break;
+		// case 40: // down
+		case 83: // s
+			return moveBackward = false;
+		break;
+		// case 39: // right
+		case 68: // d
+			return moveRight = false;
+		break;
+	}
+}
+
+
+/************************************Inicio guiData***********************/
+function guiData() {
+	var navegationButtonsElement = document.getElementById("btnNavigationWalk");
+	var blocker = document.getElementById( 'blocker' );
+	options = {
+		navigation:{
+			speed: 0.2, 
+			autoNavigation: false,
+			controlsButtons: false
+		},
+		audio: {
+			volume: 0.5,
+			mute: false
+		},
+		reset: function() {
+			this.audio.volume = 0.2;
+			this.audio.mute = false;
+			this.navigation.speed = 0.2;
+			this.autoNavigation = false;
+			this.controlsButtons = false;
+		}
+	}
+
+	var audio =  dataGui.addFolder("Audio");
+	audio.add(options.audio, 'volume', 0, 1).onChange(function(){
+		sound.setVolume(options.audio.volume);
+	}).listen();
+	audio.add(options.audio, 'mute').onChange(function(){
+		if (sound.isPlaying) {
+			sound.stop();
+		}else{
+			sound.play();
+		}
+	}).listen();
+	audio.open();
+
+	var navigation = dataGui.addFolder("Navigation");
+	navigation.add(options.navigation, 'speed', 0.1, 1).onChange(function(){
+		player.speed = options.navigation.speed;
+	}).listen();
+	navigation.add(options.navigation, 'controlsButtons').onChange(function(){
+		if (controlsButtons === true ) {
+			console.log("Disabled controls");
+			navegationButtonsElement.style.display = "none";
+			blocker.style.display = "block";
+			pointerLock();
+			controlsButtons = false;
+		}else{
+			console.log("Activated controls");
+			navegationButtonsElement.style.display = "block";
+		    blocker.style.display = "none";
+		    // controls.enabled = true;
+			controlsButtons = true;
+		}
+	}).listen();
+	navigation.add(options.navigation, 'autoNavigation').onChange(function(){
+		if (isActiveAuto === true ) {
+			console.log("Disabled auto navigation");
+			isActiveAuto = false;
+		}else{
+			console.log("Activated auto navigation");
+			isActiveAuto = true;
+		}
+	}).listen();
+	navigation.open();
+
+	dataGui.add(options, 'reset')
+}
+/************************************Fim guiData***********************/
+
+
+/************************************Inicio initMesshesFirstFase***********************/
+function initMesshesFirstFase() {
+		var casaA, casaB, terreno;
+		var arvore, arvore2, arvore3, arvore4, arbustos;
+		var barraca;
+		var max_displacement = 0.2;
+		var scale = 2;
+		const manager = initLoadingManager();
+		const loader = new THREE.JSONLoader(manager);
+		var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
+
+		loader.load( "../src/models/fase1Texture.json", addModelToScene, manager.onProgress, manager.onError);
+		// After loading JSON from our file, we add it to the scene
+		function addModelToScene( geometry, materials ) {
+			var casaA = new THREE.Mesh( geometry, materials );
+			casaA.scale.set(40,40,40);
+			casaA.position.y = -40;
+			casaA.position.z = -20;
+			casaA.position.x = -210;
+			scene.add( casaA );
+			objects.push(casaA);
+		}
+
+		loader.load( "../src/models/buildB.json", addModelToScene2, manager.onProgress, manager.onError);
+		// After loading JSON from our file, we add it to the scene
+		function addModelToScene2( geometry, materials ) {
+			casaB = new THREE.Mesh( geometry, materials );
+			casaB.scale.set(40,40,40);
+			casaB.position.y = -40;
+			casaB.position.z = 0;
+			casaB.position.x = -220;
+			casaB.name = "casaB";
+			scene.add( casaB );
+			objects.push(casaB);
+		}
+
+		loader.load( "../src/models/gradient.json", addModelToScene3, manager.onProgress, manager.onError);
+		// After loading JSON from our file, we add it to the scene
+		function addModelToScene3( geometry, materials ) {
+			terreno = new THREE.Mesh( geometry, materials );
+			terreno.scale.set(20,20,20);
+			terreno.position.y = -40;
+			terreno.position.z = -500;
+			terreno.position.x = Math.PI/2;
+			scene.add( terreno );
+		}
+
+		loader.load( "../src/models/arbustosv3.json", addModelToScene5, manager.onProgress, manager.onError);
+		// After loading JSON from our file, we add it to the scene
+		function addModelToScene5( geometry, materials ) {
+			arbustos = new THREE.Mesh( geometry, materials );
+			arbustos.scale.set(0.3,0.3,0.3);
+			arbustos.position.y = -40;
+			arbustos.position.z = 100;
+			arbustos.position.x = -550;
+			scene.add( arbustos );
+		}
+
+		loader.load( "../src/models/sobreiro.json", addModelToScene12);
+		// After loading JSON from our file, we add it to the scene
+		function addModelToScene12( geometry, materials ) {
+			arvore4 = new THREE.Mesh( geometry, materials );
+			arvore4.scale.set(30,30,30)
+			arvore4.position.y = -40;
+			arvore4.position.z = -200;
+			arvore4.position.x = -500;
+			arvore4.name = "sobreiro";
+			var arvore5 = arvore4.clone();
+			arvore5.scale.set(40,40,40)
+			arvore5.position.y = -40;
+			arvore5.position.z = -500;
+			arvore5.position.x = -300;
+			scene.add( arvore4 );
+			scene.add( arvore5 );
+			objects.push(arvore4);
+			objects.push(arvore5);
+		}
+
+		loader.load( "../src/models/barraca.json", addModelToScene13, manager.onProgress, manager.onError);
+		// After loading JSON from our file, we add it to the scene
+		function addModelToScene13( geometry, materials ) {
+			barraca = new THREE.Mesh( geometry, materials );
+			barraca.scale.set(40,40,40)
+			barraca.position.y = -40;
+			barraca.position.z = -400;
+			barraca.position.x = -500;
+			scene.add( barraca );
+		}
+		initTexture(manager); 
+		// //Load Textures
+		// var imagePrefix = "../src/img/mirobriga/panoramica/";
+		// var directions = ["posx","negx","","","posz","negz"];
+		// var imageSuffix = ".jpg";
+		// var cubeMaterials = [];
+		// for(var i = 0; i < 6; i++ )
+		// 	cubeMaterials.push(new THREE.MeshBasicMaterial({
+		// 		map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix),
+		// 		side: THREE.BackSide
+		// 	}));
+		// var cube = new THREE.Mesh( geometry, cubeMaterials );
+		// cube.position.set(50000,59000,0);
+		// scene.add( cube );
+		// cube.rotation.y=9;
+}
+	/************************************Fim initMesshesFirstFase***********************/
 
 
 /************************************Inicio animate***********************/
@@ -432,7 +381,7 @@ function initTexture(manager) {
 	// instantiate a loader
 	var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
 	var imagePrefix = "../src/img/mirobriga/panoramica/";
-	var directions = ["posx","negx","posx","negx","posz","negz"];
+	var directions = ["posx","negx","posy","posy","posz","negz"];
 	var imageSuffix = ".jpg";
 	// var url = imagePrefix + directions[i] + imageSuffix;
 	var cubeMaterials = [];
@@ -465,107 +414,94 @@ function animate() {
 
 /************************************Inicio controls***********************/
 function listenControls(key) {
+	if ((controls.enabled === true && controlsButtons === false) || (controls.enabled === false && controlsButtons === true)) {
+		var time = performance.now();
+		var delta = ( time - prevTime ) / 1000;
+
+		velocity.x -= velocity.x * 5.0 * delta;
+		velocity.z -= velocity.z * 5.0 * delta;
+
+		direction.z = Number( moveForward ) - Number( moveBackward );
+		direction.x = Number( moveLeft ) - Number( moveRight );
+		direction.normalize(); // this ensures consistent movements in all directions
+
+		//para a normalizar colocamos o player.speed entre 0 e 1 e temos que multiplicar por 2000 == valor Max
+		if ( moveForward || moveBackward ) velocity.z -= direction.z * player.speed * 2000 * delta;
+		if ( moveLeft || moveRight ) velocity.x -= direction.x * player.speed * 2000 * delta; 
+
+		controls.getObject().translateX( velocity.x * delta );
+		controls.getObject().translateY( velocity.y * delta );
+		controls.getObject().translateZ( velocity.z * delta );
+		prevTime = time;
+	}
+}
+/************************************Fim controls***********************/
 
 
-	var time = performance.now();
-	var delta = ( time - prevTime ) / 1000;
-
-	velocity.x -= velocity.x * 5.0 * delta;
-	velocity.z -= velocity.z * 5.0 * delta;
-
+function eventWalk(key){
+	var event = { keyCode: key}
+	onKeyDown(event);
+}
 
 
-	direction.z = Number( moveForward ) - Number( moveBackward );
-	direction.x = Number( moveLeft ) - Number( moveRight );
-					direction.normalize(); // this ensures consistent movements in all directions
-
-					//para a normalizar colocamos o player.speed entre 0 e 1 e temos que multiplicar por 2000 == valor Max
-					if ( moveForward || moveBackward ) velocity.z -= direction.z * player.speed * 2000 * delta;
-					if ( moveLeft || moveRight ) velocity.x -= direction.x * player.speed * 2000 * delta; 
+function eventWalkStop(key){
+	var event = { keyCode: key}
+	onKeyUp(event);
+}
 
 
+/************************************Inicio detectColision***********************/
+function detectColision() {
+	var prev_pos_x = controls.getObject().position.x;
+	var prev_pos_z = controls.getObject().position.z;
+	player.mesh = new THREE.Object3D();
+	listenControls();
+	player.rays = [
+	new THREE.Vector3(0, 0, 1),
+	new THREE.Vector3(1, 0, 1),
+	new THREE.Vector3(1, 0, 0),
+	new THREE.Vector3(1, 0, -1),
+	new THREE.Vector3(0, 0, -1),
+	new THREE.Vector3(-1, 0, -1),
+	new THREE.Vector3(-1, 0, 0),
+	new THREE.Vector3(-1, 0, 1)
+	];
 
-					controls.getObject().translateX( velocity.x * delta );
-					controls.getObject().translateY( velocity.y * delta );
-					controls.getObject().translateZ( velocity.z * delta );
+	player.raycaster = new THREE.Raycaster();
+	var i, collisions;
+	if((controls.getObject().position.x > 660 && controls.getObject().position.x < 670) || (controls.getObject().position.x < -694 && controls.getObject().position.x > - 704) || (controls.getObject().position.z > 850 && controls.getObject().position.z < 950 ) || (controls.getObject().position.z < -850 && controls.getObject().position.z > -950) ){
 
-					if ( controls.getObject().position.y < 10 ) {
+		prev_pos_x = controls.getObject().position.x;
+		prev_pos_z = controls.getObject().position.z;
+	}
+	if(controls.getObject().position.x > 670 || controls.getObject().position.x < -704 || controls.getObject().position.z > 950 || controls.getObject().position.z < -950 ){
 
-						velocity.y = 0;
-						controls.getObject().position.y = 10;
+		controls.getObject().position.x = prev_pos_x;
+		controls.getObject().position.z = prev_pos_z;
+	}
 
-						canJump = true;
+	for(i = 0; i<player.rays.length; i++){
+		player.raycaster.set(controls.getObject().position, player.rays[i] );
+		collisions = player.raycaster.intersectObjects(objects);
+		if(collisions.length > 0){
 
-					}
+			if(collisions[0].distance > 4 && collisions[0].distance < 10){
+				prev_pos_x = controls.getObject().position.x;
+				prev_pos_z = controls.getObject().position.z;
+			}
+			if(collisions[0].distance < 3){
 
-					prevTime = time;
-
-				}
-				/************************************Fim controls***********************/
-				function eventWalk(key){
-
-					var event = { keyCode: key}
-					onKeyDown(event);
-				
-				}
+				controls.getObject().position.x = prev_pos_x;
+				controls.getObject().position.z = prev_pos_z;
+			}
+		}
+	}
+}
+/************************************Fim detectColision***********************/
 
 
-				function eventWalkStop(key){
-						var event = { keyCode: key}
-						onKeyDown(event);
-					
-				}
-				/************************************Inicio detectColision***********************/
-				function detectColision() {
-					var prev_pos_x = controls.getObject().position.x;
-					var prev_pos_z = controls.getObject().position.z;
-					player.mesh = new THREE.Object3D();
-					listenControls();
-					player.rays = [
-					new THREE.Vector3(0, 0, 1),
-					new THREE.Vector3(1, 0, 1),
-					new THREE.Vector3(1, 0, 0),
-					new THREE.Vector3(1, 0, -1),
-					new THREE.Vector3(0, 0, -1),
-					new THREE.Vector3(-1, 0, -1),
-					new THREE.Vector3(-1, 0, 0),
-					new THREE.Vector3(-1, 0, 1)
-					];
-
-					player.raycaster = new THREE.Raycaster();
-					var i, collisions;
-					if((controls.getObject().position.x > 660 && controls.getObject().position.x < 670) || (controls.getObject().position.x < -694 && controls.getObject().position.x > - 704) || (controls.getObject().position.z > 850 && controls.getObject().position.z < 950 ) || (controls.getObject().position.z < -850 && controls.getObject().position.z > -950) ){
-
-						prev_pos_x = controls.getObject().position.x;
-						prev_pos_z = controls.getObject().position.z;
-					}
-					if(controls.getObject().position.x > 670 || controls.getObject().position.x < -704 || controls.getObject().position.z > 950 || controls.getObject().position.z < -950 ){
-
-						controls.getObject().position.x = prev_pos_x;
-						controls.getObject().position.z = prev_pos_z;
-					}
-
-					for(i = 0; i<player.rays.length; i++){
-						player.raycaster.set(controls.getObject().position, player.rays[i] );
-						collisions = player.raycaster.intersectObjects(objects);
-						if(collisions.length > 0){
-
-							if(collisions[0].distance > 4 && collisions[0].distance < 10){
-								prev_pos_x = controls.getObject().position.x;
-								prev_pos_z = controls.getObject().position.z;
-							}
-							if(collisions[0].distance < 3){
-
-								controls.getObject().position.x = prev_pos_x;
-								controls.getObject().position.z = prev_pos_z;
-							}
-						}
-					}
-				}
-				/************************************Fim detectColision***********************/
-
-				/************************************Inicio initAudio***********************/
-				function initAudio(){
+/************************************Inicio initAudio***********************/
+function initAudio(){
 	// create an AudioListener and add it to the camera
 	var listener = new THREE.AudioListener();
 	camera.add( listener );
@@ -580,15 +516,12 @@ function listenControls(key) {
 		sound.setVolume(0.5);
 		sound.play();
 	});
-	// sessionStorage.setItem('modelIsLoaded', true);
-
 }
 /************************************Fim initAudio***********************/
 
 
 /************************************Inicio Fim Full Screen***********************/
 function openScreen() {
-	console.log("entrou")
 	if(IsFullScreenCurrently()){
 		GoOutFullscreen();
 	}
@@ -603,6 +536,8 @@ function openScreen() {
 		el.style.width =  "100%";
 		el.style.height = "100%";
 		el.style.margin = "0";
+		pointerLock();
+
 	}
 }
 /* Get into full screen */
