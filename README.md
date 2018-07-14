@@ -41,5 +41,13 @@ install sass-loader --save --dev
 
 # npm install microcache
 
+
+#TODO
+ Navegação Automatica
+ Texturizar as casas 
+ Tradução da pagina para portugues e ingels
+ Publicar o site
+ Perguntar ao Quaresma os passaros que haviam na altura, e se o vento era forte ou nao
+ Animação para porta
 ```
 For learning Branching and Merging, consult this [docs git-fast-version-control](https://git-scm.com/book/pt-br/v2/Git-Branching-Basic-Branching-and-Merging)

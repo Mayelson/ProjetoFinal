@@ -19,7 +19,7 @@
 				</li>
 			</ul>
 			</div>
-			<button id="language" @click.prevent="translate">PT/EN</button>
+			<div id="google_translate_element"></div>
 		</nav>
 	</div>
 </template>
@@ -27,11 +27,6 @@
 <script type="text/javascript">
 
     export default {
-    	methods: {
-    		translate(){
-    			alert("A tradução ainda não foi implementada");
-    		}
-    	}
     }
 </script>
 
@@ -57,4 +52,18 @@
 	li{
 		margin-left: 30px;
 	}
+	a.goog-te-menu-value > span {
+		color: black;
+	}
+	a.goog-te-menu-value {
+		text-decoration: none;
+	}
+	div.goog-te-gadget-simple {
+		border-radius: 15px;
+		background-color: #841818;
+		padding: 7px;
+	}
+/*	.skiptranslate{
+		display: none;
+	}*/
 </style>

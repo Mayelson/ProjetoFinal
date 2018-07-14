@@ -3,7 +3,7 @@
 		<div class="col-12">
 			<div class="jumbotron">
 				<center>
-			  		<h1 class="display-4"><b>Bem Vindo à Reconstrulão Miróbriga </b></h1>
+			  		<h1 class="display-4"><b>Bem Vindo à Reconstrução Miróbriga </b></h1>
 				</center>
 				<center>
 			  		<p class="lead"><h6>Esta é uma plataforma de interação virtual de duas habitações Miróbrigas!</h6></p>
