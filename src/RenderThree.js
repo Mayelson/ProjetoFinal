@@ -28,6 +28,11 @@ var direction = new THREE.Vector3();
 var vertex = new THREE.Vector3();
 var color = new THREE.Color();
 
+var cont = 0;
+var looptime = 35000;
+var vertices = [];
+var path;
+var spline;
 /************************************Inicio initLoadingManager***********************/
 function initLoadingManager() {
 
@@ -165,6 +170,7 @@ function init() {
 	var light = new THREE.HemisphereLight( 0xffffff, 0xffffff, 1 );          
 	light.position.set( -120, 80, 40 );
 	scene.add( light );
+
 
 /*
 	function keyDown(event){
@@ -306,10 +312,12 @@ function init() {
 			navigation.open();
 			navigation.add(options.navigation, 'autoNavigation').onChange(function(){
 				if (isActiveAuto === true ) {
+
 					console.log("Disabled auto navigation");
 					isActiveAuto = false;
 				}else{
 					console.log("Activated auto navigation");
+					drawPath(pathCast.length);
 					isActiveAuto = true;
 				}
 			}).listen();
@@ -451,7 +459,80 @@ function initTexture(manager) {
 }
 /************************************Fim initMesshesFirstFase***********************/
 
+function drawPath(count) {
+    var i;
+    var tubeGeometry;
+    for (i = 0; i < count; i += 3) {
+        vertices.push(new THREE.Vector3(pathCast[i], pathCast[i + 1], pathCast[i + 2]));
+    }
 
+    if (vertices.length == 0) {
+        return;
+    }
+
+    path = new THREE.CurvePath();
+
+    spline = new THREE.CatmullRomCurve3(vertices);
+    path.add(spline);
+
+    var geometry = new THREE.TubeGeometry( path, 20, 2, 8, false );
+	var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+	var mesh = new THREE.Mesh( geometry, material );
+	scene.add( mesh )
+    //addCameraToPath();
+}
+ 
+ /*
+function addCameraToPath() {
+    var g = new THREE.SphereGeometry(1, 1),
+        m = new THREE.MeshBasicMaterial({color: 0xff0000});
+
+    cameraOnPath = new THREE.Mesh(g, m);
+    cameraOnPath.visible = false;
+    scene.add(cameraOnPath);
+    positionPathCamera();
+}
+
+function positionPathCamera() {
+    if (vertices.length == 0) {
+        return;
+    }
+
+    var time, t;
+
+    time = cont;
+
+
+    t = ( time % looptime ) / looptime;
+
+
+    var camPos = spline.getPoint(t);
+    var camRot = spline.getTangent(t);
+
+    controls.getObject().position.x = camPos.x;
+    controls.getObject().position.y = camPos.y;
+    controls.getObject().position.z = camPos.z;
+
+    controls.getObject().position.x = camRot.x;
+    controls.getObject().position.y = camRot.y;
+  	controls.getObject().position.z = camRot.z;
+	console.log(camPos);
+
+    //if (ANIMATE) {
+        camera.lookAt(spline.getPoint(t + (1 / 10000)));
+
+
+        cont++;
+        if (!(cont > 0 && cont < looptime)) {
+            cont = 0;
+        }
+    //} else if (!loaded) {
+        camera.lookAt(spline.getPoint(t + (1 / 10000)));
+   // }
+}
+
+
+*/
 /************************************Inicio animate***********************/
 function animate() {
 	
