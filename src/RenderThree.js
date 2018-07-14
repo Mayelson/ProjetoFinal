@@ -27,6 +27,11 @@ var direction = new THREE.Vector3();
 var vertex = new THREE.Vector3();
 var color = new THREE.Color();
 
+var cont = 0;
+var looptime = 35000;
+var vertices = [];
+var path;
+var spline;
 /************************************Inicio initLoadingManager***********************/
 function initLoadingManager() {
 
@@ -171,101 +176,112 @@ function onKeyDown( event ) {
 		// case 39: // right
 		case 68: // d
 			return moveRight = true;
-		break;
-	}
-}
-
-function onKeyUp( event ) {
-	switch( event.keyCode ) {
-		// case 38: // up
-		case 87: // w
-			return	moveForward = false;
-		break;
-		// case 37: // left
-		case 65: // a
-			return	moveLeft = false;
-		break;
-		// case 40: // down
-		case 83: // s
-			return moveBackward = false;
-		break;
-		// case 39: // right
-		case 68: // d
-			return moveRight = false;
-		break;
-	}
-}
-
-
-/************************************Inicio guiData***********************/
-function guiData() {
-	var navegationButtonsElement = document.getElementById("btnNavigationWalk");
-	var blocker = document.getElementById( 'blocker' );
-	options = {
-		navigation:{
-			speed: 0.2, 
-			autoNavigation: false,
-			controlsButtons: false
-		},
-		audio: {
-			volume: 0.5,
-			mute: false
-		},
-		reset: function() {
-			this.audio.volume = 0.2;
-			this.audio.mute = false;
-			this.navigation.speed = 0.2;
-			this.autoNavigation = false;
-			this.controlsButtons = false;
+		break;		
 		}
-	}
 
-	var audio =  dataGui.addFolder("Audio");
-	audio.add(options.audio, 'volume', 0, 1).onChange(function(){
-		sound.setVolume(options.audio.volume);
-	}).listen();
-	audio.add(options.audio, 'mute').onChange(function(){
-		if (sound.isPlaying) {
-			sound.stop();
-		}else{
-			sound.play();
-		}
-	}).listen();
-	audio.open();
+	};
 
-	var navigation = dataGui.addFolder("Navigation");
-	navigation.add(options.navigation, 'speed', 0.1, 1).onChange(function(){
-		player.speed = options.navigation.speed;
-	}).listen();
-	navigation.add(options.navigation, 'controlsButtons').onChange(function(){
-		if (controlsButtons === true ) {
-			console.log("Disabled controls");
-			navegationButtonsElement.style.display = "none";
-			blocker.style.display = "block";
-			pointerLock();
-			controlsButtons = false;
-		}else{
-			console.log("Activated controls");
-			navegationButtonsElement.style.display = "block";
-		    blocker.style.display = "none";
-		    // controls.enabled = true;
-			controlsButtons = true;
-		}
-	}).listen();
-	navigation.add(options.navigation, 'autoNavigation').onChange(function(){
-		if (isActiveAuto === true ) {
-			console.log("Disabled auto navigation");
-			isActiveAuto = false;
-		}else{
-			console.log("Activated auto navigation");
-			isActiveAuto = true;
-		}
-	}).listen();
-	navigation.open();
+	function onKeyUp( event ) {
 
-	dataGui.add(options, 'reset')
-}
-/************************************Fim guiData***********************/
+		switch( event.keyCode ) {
+
+				// case 38: // up
+				case 87: // w
+				return	moveForward = false;
+				break;
+
+				// case 37: // left
+				case 65: // a
+				return	moveLeft = false;
+				break;
+
+				// case 40: // down
+				case 83: // s
+				return moveBackward = false;
+				break;
+
+				// case 39: // right
+				case 68: // d
+				return moveRight = false;
+				break;
+
+			}
+
+		};
+
+		/************************************Inicio guiData***********************/
+		function guiData() {
+			var navegationButtonsElement = document.getElementById("btnNavigationWalk");
+			var blocker = document.getElementById( 'blocker' );
+			options = {
+				navigation:{
+					speed: 0.2, 
+					autoNavigation: false,
+					controlsButtons: false
+				},
+				audio: {
+					volume: 0.5,
+					mute: false
+				},
+				reset: function() {
+					this.audio.volume = 0.2;
+					this.audio.mute = false;
+					this.navigation.speed = 300;
+					this.autoNavigation = false;
+					this.controlsButtons = false;
+				}
+			}
+
+			var audio =  dataGui.addFolder("Son");
+			audio.add(options.audio, 'volume', 0, 1).onChange(function(){
+				sound.setVolume(options.audio.volume);
+			}).listen();
+			audio.add(options.audio, 'mute').onChange(function(){
+				if (sound.isPlaying) {
+					sound.stop();
+				}else{
+					sound.play();
+				}
+			}).listen();
+			audio.open();
+
+			var navigation = dataGui.addFolder("Navigation");
+			navigation.add(options.navigation, 'speed', 0.1, 1).onChange(function(){
+				player.speed = options.navigation.speed;
+			}).listen();
+			navigation.add(options.navigation, 'controlsButtons').onChange(function(){
+				if (controlsButtons === true ) {
+					console.log("Disabled controls");
+					navegationButtonsElement.style.display = "none";
+					blocker.style.display = "block";
+					controlsButtons = false;
+
+				}else{
+
+					console.log("Activated controls");
+					navegationButtonsElement.style.display = "block";
+				    blocker.style.display = "none";
+				    controls.enabled = false;
+					controlsButtons = true;
+				}
+			}).listen();
+			navigation.open();
+			navigation.add(options.navigation, 'autoNavigation').onChange(function(){
+				if (isActiveAuto === true ) {
+
+					console.log("Disabled auto navigation");
+					isActiveAuto = false;
+				}else{
+					console.log("Activated auto navigation");
+					drawPath(pathCast.length);
+					isActiveAuto = true;
+				}
+			}).listen();
+
+			dataGui.add(options, 'reset')
+		}
+		/************************************Fim guiData***********************/
+
 
 
 /************************************Inicio initMesshesFirstFase***********************/
@@ -327,7 +343,7 @@ function initMesshesFirstFase() {
 		// }
 
 		// loader.load( "../src/models/sobreiro.json", addModelToScene12);
-		// // After loading JSON from our file, we add it to the scene
+		// // After loading JSON from our file, we add it to the scne
 		// function addModelToScene12( geometry, materials ) {
 		// 	arvore4 = new THREE.Mesh( geometry, materials );
 		// 	arvore4.scale.set(30,30,30)
@@ -400,7 +416,80 @@ function initTexture(manager) {
 }
 /************************************Fim initMesshesFirstFase***********************/
 
+function drawPath(count) {
+    var i;
+    var tubeGeometry;
+    for (i = 0; i < count; i += 3) {
+        vertices.push(new THREE.Vector3(pathCast[i], pathCast[i + 1], pathCast[i + 2]));
+    }
 
+    if (vertices.length == 0) {
+        return;
+    }
+
+    path = new THREE.CurvePath();
+
+    spline = new THREE.CatmullRomCurve3(vertices);
+    path.add(spline);
+
+    var geometry = new THREE.TubeGeometry( path, 20, 2, 8, false );
+	var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+	var mesh = new THREE.Mesh( geometry, material );
+	scene.add( mesh )
+    //addCameraToPath();
+}
+ 
+ /*
+function addCameraToPath() {
+    var g = new THREE.SphereGeometry(1, 1),
+        m = new THREE.MeshBasicMaterial({color: 0xff0000});
+
+    cameraOnPath = new THREE.Mesh(g, m);
+    cameraOnPath.visible = false;
+    scene.add(cameraOnPath);
+    positionPathCamera();
+}
+
+function positionPathCamera() {
+    if (vertices.length == 0) {
+        return;
+    }
+
+    var time, t;
+
+    time = cont;
+
+
+    t = ( time % looptime ) / looptime;
+
+
+    var camPos = spline.getPoint(t);
+    var camRot = spline.getTangent(t);
+
+    controls.getObject().position.x = camPos.x;
+    controls.getObject().position.y = camPos.y;
+    controls.getObject().position.z = camPos.z;
+
+    controls.getObject().position.x = camRot.x;
+    controls.getObject().position.y = camRot.y;
+  	controls.getObject().position.z = camRot.z;
+	console.log(camPos);
+
+    //if (ANIMATE) {
+        camera.lookAt(spline.getPoint(t + (1 / 10000)));
+
+
+        cont++;
+        if (!(cont > 0 && cont < looptime)) {
+            cont = 0;
+        }
+    //} else if (!loaded) {
+        camera.lookAt(spline.getPoint(t + (1 / 10000)));
+   // }
+}
+
+
+*/
 /************************************Inicio animate***********************/
 function animate() {
 	
