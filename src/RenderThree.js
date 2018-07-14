@@ -135,9 +135,9 @@ function init() {
 	elementArea = document.getElementById("area");
 	elementArea.append(renderer.domElement);
 	
-	// dataGui = new dat.GUI();
-	// var elementDataGui = dataGui.domElement.offsetParent;
-	// elementArea.appendChild(elementDataGui);
+	dataGui = new dat.GUI();
+	var elementDataGui = dataGui.domElement.offsetParent;
+	elementArea.appendChild(elementDataGui);
 
 	scene = new THREE.Scene();
 	scene.background = new THREE.Color( 0xffffff );
@@ -232,7 +232,7 @@ function onKeyDown( event ) {
 				}
 			}
 
-			var audio =  dataGui.addFolder("Son");
+			var audio =  dataGui.addFolder("Audio");
 			audio.add(options.audio, 'volume', 0, 1).onChange(function(){
 				sound.setVolume(options.audio.volume);
 			}).listen();
