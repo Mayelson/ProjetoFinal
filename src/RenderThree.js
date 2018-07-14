@@ -130,9 +130,9 @@ function init() {
 	elementArea = document.getElementById("area");
 	elementArea.append(renderer.domElement);
 	
-	dataGui = new dat.GUI();
-	var elementDataGui = dataGui.domElement.offsetParent;
-	elementArea.appendChild(elementDataGui);
+	// dataGui = new dat.GUI();
+	// var elementDataGui = dataGui.domElement.offsetParent;
+	// elementArea.appendChild(elementDataGui);
 
 	scene = new THREE.Scene();
 	scene.background = new THREE.Color( 0xffffff );
@@ -279,30 +279,30 @@ function initMesshesFirstFase() {
 		const loader = new THREE.JSONLoader(manager);
 		var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
 
-		loader.load( "../src/models/fase1Texture.json", addModelToScene, manager.onProgress, manager.onError);
-		// After loading JSON from our file, we add it to the scene
-		function addModelToScene( geometry, materials ) {
-			var casaA = new THREE.Mesh( geometry, materials );
-			casaA.scale.set(40,40,40);
-			casaA.position.y = -40;
-			casaA.position.z = -20;
-			casaA.position.x = -210;
-			scene.add( casaA );
-			objects.push(casaA);
-		}
+		// loader.load( "../src/models/fase1Texture.json", addModelToScene, manager.onProgress, manager.onError);
+		// // After loading JSON from our file, we add it to the scene
+		// function addModelToScene( geometry, materials ) {
+		// 	var casaA = new THREE.Mesh( geometry, materials );
+		// 	casaA.scale.set(40,40,40);
+		// 	casaA.position.y = -40;
+		// 	casaA.position.z = -20;
+		// 	casaA.position.x = -210;
+		// 	scene.add( casaA );
+		// 	objects.push(casaA);
+		// }
 
-		loader.load( "../src/models/buildB.json", addModelToScene2, manager.onProgress, manager.onError);
-		// After loading JSON from our file, we add it to the scene
-		function addModelToScene2( geometry, materials ) {
-			casaB = new THREE.Mesh( geometry, materials );
-			casaB.scale.set(40,40,40);
-			casaB.position.y = -40;
-			casaB.position.z = 0;
-			casaB.position.x = -220;
-			casaB.name = "casaB";
-			scene.add( casaB );
-			objects.push(casaB);
-		}
+		// loader.load( "../src/models/buildB.json", addModelToScene2, manager.onProgress, manager.onError);
+		// // After loading JSON from our file, we add it to the scene
+		// function addModelToScene2( geometry, materials ) {
+		// 	casaB = new THREE.Mesh( geometry, materials );
+		// 	casaB.scale.set(40,40,40);
+		// 	casaB.position.y = -40;
+		// 	casaB.position.z = 0;
+		// 	casaB.position.x = -220;
+		// 	casaB.name = "casaB";
+		// 	scene.add( casaB );
+		// 	objects.push(casaB);
+		// }
 
 		loader.load( "../src/models/gradient.json", addModelToScene3, manager.onProgress, manager.onError);
 		// After loading JSON from our file, we add it to the scene
@@ -315,47 +315,47 @@ function initMesshesFirstFase() {
 			scene.add( terreno );
 		}
 
-		loader.load( "../src/models/arbustosv3.json", addModelToScene5, manager.onProgress, manager.onError);
-		// After loading JSON from our file, we add it to the scene
-		function addModelToScene5( geometry, materials ) {
-			arbustos = new THREE.Mesh( geometry, materials );
-			arbustos.scale.set(0.3,0.3,0.3);
-			arbustos.position.y = -40;
-			arbustos.position.z = 100;
-			arbustos.position.x = -550;
-			scene.add( arbustos );
-		}
+		// loader.load( "../src/models/arbustosv3.json", addModelToScene5, manager.onProgress, manager.onError);
+		// // After loading JSON from our file, we add it to the scene
+		// function addModelToScene5( geometry, materials ) {
+		// 	arbustos = new THREE.Mesh( geometry, materials );
+		// 	arbustos.scale.set(0.3,0.3,0.3);
+		// 	arbustos.position.y = -40;
+		// 	arbustos.position.z = 100;
+		// 	arbustos.position.x = -550;
+		// 	scene.add( arbustos );
+		// }
 
-		loader.load( "../src/models/sobreiro.json", addModelToScene12);
-		// After loading JSON from our file, we add it to the scene
-		function addModelToScene12( geometry, materials ) {
-			arvore4 = new THREE.Mesh( geometry, materials );
-			arvore4.scale.set(30,30,30)
-			arvore4.position.y = -40;
-			arvore4.position.z = -200;
-			arvore4.position.x = -500;
-			arvore4.name = "sobreiro";
-			var arvore5 = arvore4.clone();
-			arvore5.scale.set(40,40,40)
-			arvore5.position.y = -40;
-			arvore5.position.z = -500;
-			arvore5.position.x = -300;
-			scene.add( arvore4 );
-			scene.add( arvore5 );
-			objects.push(arvore4);
-			objects.push(arvore5);
-		}
+		// loader.load( "../src/models/sobreiro.json", addModelToScene12);
+		// // After loading JSON from our file, we add it to the scene
+		// function addModelToScene12( geometry, materials ) {
+		// 	arvore4 = new THREE.Mesh( geometry, materials );
+		// 	arvore4.scale.set(30,30,30)
+		// 	arvore4.position.y = -40;
+		// 	arvore4.position.z = -200;
+		// 	arvore4.position.x = -500;
+		// 	arvore4.name = "sobreiro";
+		// 	var arvore5 = arvore4.clone();
+		// 	arvore5.scale.set(40,40,40)
+		// 	arvore5.position.y = -40;
+		// 	arvore5.position.z = -500;
+		// 	arvore5.position.x = -300;
+		// 	scene.add( arvore4 );
+		// 	scene.add( arvore5 );
+		// 	objects.push(arvore4);
+		// 	objects.push(arvore5);
+		// }
 
-		loader.load( "../src/models/barraca.json", addModelToScene13, manager.onProgress, manager.onError);
-		// After loading JSON from our file, we add it to the scene
-		function addModelToScene13( geometry, materials ) {
-			barraca = new THREE.Mesh( geometry, materials );
-			barraca.scale.set(40,40,40)
-			barraca.position.y = -40;
-			barraca.position.z = -400;
-			barraca.position.x = -500;
-			scene.add( barraca );
-		}
+		// loader.load( "../src/models/barraca.json", addModelToScene13, manager.onProgress, manager.onError);
+		// // After loading JSON from our file, we add it to the scene
+		// function addModelToScene13( geometry, materials ) {
+		// 	barraca = new THREE.Mesh( geometry, materials );
+		// 	barraca.scale.set(40,40,40)
+		// 	barraca.position.y = -40;
+		// 	barraca.position.z = -400;
+		// 	barraca.position.x = -500;
+		// 	scene.add( barraca );
+		// }
 		initTexture(manager); 
 		// //Load Textures
 		// var imagePrefix = "../src/img/mirobriga/panoramica/";
@@ -519,7 +519,9 @@ function initAudio(){
 }
 /************************************Fim initAudio***********************/
 
-
+function translate() {
+    alert("A tradução ainda não foi implementada");
+}
 /************************************Inicio Fim Full Screen***********************/
 function openScreen() {
 	if(IsFullScreenCurrently()){

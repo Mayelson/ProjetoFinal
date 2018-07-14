@@ -7,7 +7,11 @@
 footer{
     background: #F7F7F2;
     padding: 6px;
-    margin-left:0; 
+    padding-top: 15px;
+    /*margin-left:0;*/
+    /*position: fixed;*/
+    top: 0px;
+    bottom: 0px; 
     margin-bottom: 150;
 
 }

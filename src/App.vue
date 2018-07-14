@@ -1,11 +1,13 @@
 <template>
+  <div>
+    <nav-bar></nav-bar>
     <div class="container">
-        <nav-bar></nav-bar>
-            <br>
-            <router-view></router-view>
-            <br>
-        <footer-bar></footer-bar>
+        <br>
+        <router-view></router-view>
+        <br>
     </div>
+    <footer-bar></footer-bar>
+  </div>
 </template>
 
 <script type="text/javascript">
@@ -18,12 +20,13 @@
          'nav-bar': Navbar,
          'footer-bar': Footer
       },
+      
     } 
 </script>
 
 
 <style type="text/css">
   body{
-    background-color: #dae0e5;
+    background-color: #841818;
   }
 </style>
