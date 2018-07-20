@@ -26,12 +26,22 @@ var velocity = new THREE.Vector3();
 var direction = new THREE.Vector3();
 var vertex = new THREE.Vector3();
 var color = new THREE.Color();
-
-var cont = 0;
-var looptime = 35000;
+var mixer, facesClip, bonesClip,helper;
+var time=0;
+var count=0;
+var binormal = new THREE.Vector3();
+var normal = new THREE.Vector3();
+var tube;
+var splineCamera;
+var parent;
+var cont = 1;
+var looptime = 350000;
 var vertices = [];
 var path;
 var spline;
+var drenos;
+
+
 /************************************Inicio initLoadingManager***********************/
 function initLoadingManager() {
 
@@ -79,7 +89,7 @@ function initLoadingManager() {
 	    var blocker = document.getElementById( 'blocker' );
 	    blocker.style.display = "block";
 	    initAudio();
-		guiData();
+	    guiData();
 	    
 	};
 	manager.onError = function ( e ) { 
@@ -154,6 +164,19 @@ function init() {
 	light.position.set( -120, 80, 40 );
 	scene.add( light );
 
+
+	parent = new THREE.Object3D();
+	scene.add( parent );
+
+	// splineCamera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.01, 200000 );
+	// controls = new THREE.PointerLockControls(splineCamera);
+	// parent.add( splineCamera );
+
+	// //splineCamera.position.x = cordX[0];
+	// splineCamera.position.y = 10;
+	//splineCamera.position.z = cordY[0];  
+
+
 	document.addEventListener( 'keydown', onKeyDown, false );
 	document.addEventListener( 'keyup', onKeyUp, false );						
 }
@@ -163,27 +186,40 @@ function onKeyDown( event ) {
 	switch ( event.keyCode ) {
 		// case 38: // up
 		case 87: // w
-			return moveForward = true;
+		if(isActiveAuto==true){
+			//splineCamera.rotation.y = controls.getObject().rotation.y;
+			
+			time++;
+			time++;
+			time++;
+			time++;
+			time++;
+			time++;
+		drawPath();
+		}
+		    
+		return moveForward = true;
+
 		break;
 		// case 37: // left
 		case 65: // a
-			return moveLeft = true;
+		return moveLeft = true;
 		break;
 		// case 40: // down
 		case 83: // s
-			return moveBackward = true;
+		return moveBackward = true;
 		break;
 		// case 39: // right
 		case 68: // d
-			return moveRight = true;
+		return moveRight = true;
 		break;		
-		}
+	}
 
-	};
+};
 
-	function onKeyUp( event ) {
+function onKeyUp( event ) {
 
-		switch( event.keyCode ) {
+	switch( event.keyCode ) {
 
 				// case 38: // up
 				case 87: // w
@@ -260,8 +296,8 @@ function onKeyDown( event ) {
 
 					console.log("Activated controls");
 					navegationButtonsElement.style.display = "block";
-				    blocker.style.display = "none";
-				    controls.enabled = false;
+					blocker.style.display = "none";
+					controls.enabled = false;
 					controlsButtons = true;
 				}
 			}).listen();
@@ -273,8 +309,14 @@ function onKeyDown( event ) {
 					isActiveAuto = false;
 				}else{
 					console.log("Activated auto navigation");
-					drawPath(pathCast.length);
-					isActiveAuto = true;
+
+				controls.getObject().position.x = cordX[0];				
+				controls.getObject().position.z = cordZ[0];  
+				controls.getObject().rotation.y = -2.0;
+
+				isActiveAuto = true;
+					
+
 				}
 			}).listen();
 
@@ -284,95 +326,135 @@ function onKeyDown( event ) {
 
 
 
-/************************************Inicio initMesshesFirstFase***********************/
-function initMesshesFirstFase() {
-		var casaA, casaB, terreno;
-		var arvore, arvore2, arvore3, arvore4, arbustos;
-		var barraca;
-		var max_displacement = 0.2;
-		var scale = 2;
-		const manager = initLoadingManager();
-		const loader = new THREE.JSONLoader(manager);
-		var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
+		/************************************Inicio initMesshesFirstFase***********************/
+		function initMesshesFirstFase() {
+			var casaA, casaB, terreno, animation;
+			var arvore, arvore2, arvore3, arvore4,arvoreNova, arbustos, arvoreNova2;
+			var barraca;
+			var max_displacement = 0.2;
+			var scale = 2;
+			const manager = initLoadingManager();
+			const loader = new THREE.JSONLoader(manager);
+			var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
+			//primeira fase
+			if (fase == 1) {
+				loader.load( "../src/models/buildA.json", addModelToScene, manager.onProgress, manager.onError);
+				// After loading JSON from our file, we add it to the scene
+				function addModelToScene( geometry, materials ) {
+					var casaA = new THREE.Mesh( geometry, materials );
+					casaA.scale.set(40,40,40);
+					casaA.position.y = -40;
+					casaA.position.z = -20;
+					casaA.position.x = -210;
+					scene.add( casaA );
+					objects.push(casaA);
+				}
 
-		// loader.load( "../src/models/fase1Texture.json", addModelToScene, manager.onProgress, manager.onError);
-		// // After loading JSON from our file, we add it to the scene
-		// function addModelToScene( geometry, materials ) {
-		// 	var casaA = new THREE.Mesh( geometry, materials );
-		// 	casaA.scale.set(40,40,40);
-		// 	casaA.position.y = -40;
-		// 	casaA.position.z = -20;
-		// 	casaA.position.x = -210;
-		// 	scene.add( casaA );
-		// 	objects.push(casaA);
-		// }
+				loader.load( "../src/models/buildB.json", addModelToScene2, manager.onProgress, manager.onError);
+				// After loading JSON from our file, we add it to the scene
+				function addModelToScene2( geometry, materials ) {
+					casaB = new THREE.Mesh( geometry, materials );
+					casaB.scale.set(40,40,40);
+					casaB.position.y = -40;
+					casaB.position.z = 0;
+					casaB.position.x = -220;
+					casaB.name = "casaB";
+					scene.add( casaB );
+					objects.push(casaB);
+				}
 
-		// loader.load( "../src/models/buildB.json", addModelToScene2, manager.onProgress, manager.onError);
-		// // After loading JSON from our file, we add it to the scene
-		// function addModelToScene2( geometry, materials ) {
-		// 	casaB = new THREE.Mesh( geometry, materials );
-		// 	casaB.scale.set(40,40,40);
-		// 	casaB.position.y = -40;
-		// 	casaB.position.z = 0;
-		// 	casaB.position.x = -220;
-		// 	casaB.name = "casaB";
-		// 	scene.add( casaB );
-		// 	objects.push(casaB);
-		// }
 
-		loader.load( "../src/models/gradient.json", addModelToScene3, manager.onProgress, manager.onError);
-		// After loading JSON from our file, we add it to the scene
-		function addModelToScene3( geometry, materials ) {
-			terreno = new THREE.Mesh( geometry, materials );
-			terreno.scale.set(20,20,20);
-			terreno.position.y = -40;
-			terreno.position.z = -500;
-			terreno.position.x = Math.PI/2;
-			scene.add( terreno );
-		}
+				loader.load( "../src/models/arvoreV9.json", addModelToScene15, manager.onProgress, manager.onError);
+				function addModelToScene15( geometry, materials ) {
+					arvoreNova = new THREE.Mesh( geometry, materials );
+					arvoreNova.scale.set(40,40,40);
+					arvoreNova.position.y = -40;
+					arvoreNova.position.z = 200;
+					arvoreNova.position.x = -550;
+					arvoreNova.name = "arvoreNova";
+					scene.add( arvoreNova );
+					objects.push(arvoreNova);
+				}
 
-		// loader.load( "../src/models/arbustosv3.json", addModelToScene5, manager.onProgress, manager.onError);
-		// // After loading JSON from our file, we add it to the scene
-		// function addModelToScene5( geometry, materials ) {
-		// 	arbustos = new THREE.Mesh( geometry, materials );
-		// 	arbustos.scale.set(0.3,0.3,0.3);
-		// 	arbustos.position.y = -40;
-		// 	arbustos.position.z = 100;
-		// 	arbustos.position.x = -550;
-		// 	scene.add( arbustos );
-		// }
 
-		// loader.load( "../src/models/sobreiro.json", addModelToScene12);
-		// // After loading JSON from our file, we add it to the scne
-		// function addModelToScene12( geometry, materials ) {
-		// 	arvore4 = new THREE.Mesh( geometry, materials );
-		// 	arvore4.scale.set(30,30,30)
-		// 	arvore4.position.y = -40;
-		// 	arvore4.position.z = -200;
-		// 	arvore4.position.x = -500;
-		// 	arvore4.name = "sobreiro";
-		// 	var arvore5 = arvore4.clone();
-		// 	arvore5.scale.set(40,40,40)
-		// 	arvore5.position.y = -40;
-		// 	arvore5.position.z = -500;
-		// 	arvore5.position.x = -300;
-		// 	scene.add( arvore4 );
-		// 	scene.add( arvore5 );
-		// 	objects.push(arvore4);
-		// 	objects.push(arvore5);
-		// }
+				loader.load( "../src/models/arvoreV10.json", addModelToScene16, manager.onProgress, manager.onError);
+				function addModelToScene16( geometry, materials ) {
+					arvoreNova2 = new THREE.Mesh( geometry, materials );
+					arvoreNova2.scale.set(20,20,20);
+					arvoreNova2.position.y = -40;
+					arvoreNova2.position.z = 600;
+					arvoreNova2.position.x = -550;
+					arvoreNova2.name = "arvoreNova";
+					scene.add( arvoreNova2 );
+					objects.push(arvoreNova2);
+				}
 
-		// loader.load( "../src/models/barraca.json", addModelToScene13, manager.onProgress, manager.onError);
-		// // After loading JSON from our file, we add it to the scene
-		// function addModelToScene13( geometry, materials ) {
-		// 	barraca = new THREE.Mesh( geometry, materials );
-		// 	barraca.scale.set(40,40,40)
-		// 	barraca.position.y = -40;
-		// 	barraca.position.z = -400;
-		// 	barraca.position.x = -500;
-		// 	scene.add( barraca );
-		// }
-		initTexture(manager); 
+				loader.load( "../src/models/gradient.json", addModelToScene3, manager.onProgress, manager.onError);
+				// After loading JSON from our file, we add it to the scene
+				function addModelToScene3( geometry, materials ) {
+					terreno = new THREE.Mesh( geometry, materials );
+					terreno.scale.set(12,12,12);
+					terreno.position.y = -40;
+					terreno.position.z = -500;
+					terreno.position.x = Math.PI/2;
+					scene.add( terreno );
+				}
+
+				loader.load( "../src/models/arbustosv3.json", addModelToScene5, manager.onProgress, manager.onError);
+				// After loading JSON from our file, we add it to the scene
+				function addModelToScene5( geometry, materials ) {
+					arbustos = new THREE.Mesh( geometry, materials );
+					arbustos.scale.set(0.3,0.3,0.3);
+					arbustos.position.y = -40;
+					arbustos.position.z = 100;
+					arbustos.position.x = -550;
+					scene.add( arbustos );
+				}
+
+				loader.load( "../src/models/sobreiro.json", addModelToScene12);
+				// After loading JSON from our file, we add it to the scene
+				function addModelToScene12( geometry, materials ) {
+					arvore4 = new THREE.Mesh( geometry, materials );
+					arvore4.scale.set(30,30,30)
+					arvore4.position.y = -40;
+					arvore4.position.z = -200;
+					arvore4.position.x = -500;
+					arvore4.name = "sobreiro";
+					var arvore5 = arvore4.clone();
+					arvore5.scale.set(40,40,40)
+					arvore5.position.y = -40;
+					arvore5.position.z = -500;
+					arvore5.position.x = -300;
+					scene.add( arvore4 );
+					scene.add( arvore5 );
+					objects.push(arvore4);
+					objects.push(arvore5);
+				}
+
+				loader.load( "../src/models/drenos.json", addModelToScene13);
+				// After loading JSON from our file, we add it to the scene
+				function addModelToScene13( geometry, materials ) {
+					drenos = new THREE.Mesh( geometry, materials );
+					drenos.scale.set(40,40,40)
+					drenos.position.y = -40;
+					drenos.position.z = -20;
+					drenos.position.x = -210;
+					scene.add(drenos);
+
+				}
+
+
+				loader.load( "../src/models/knight.json", addModelToScene20);
+				// After loading JSON from our file, we add it to the scene
+				function addModelToScene20( geometry, materials ) {
+						createScene( geometry, materials, 0, -40, -40, 5 );
+				}
+
+
+			} else if (fase == 2) {
+				console.log("Fase 2 A carregar");
+			}
+			initTexture(manager); 
 		// //Load Textures
 		// var imagePrefix = "../src/img/mirobriga/panoramica/";
 		// var directions = ["posx","negx","","","posz","negz"];
@@ -387,12 +469,52 @@ function initMesshesFirstFase() {
 		// cube.position.set(50000,59000,0);
 		// scene.add( cube );
 		// cube.rotation.y=9;
-}
+	}
 	/************************************Fim initMesshesFirstFase***********************/
+	function createScene( geometry, materials, x, y, z, s ) {
+
+				//ensureLoop( geometry.animation );
+
+				geometry.computeBoundingBox();
+				var bb = geometry.boundingBox;
+			    for ( var i = 0; i < materials.length; i ++ ) {
+
+					var m = materials[ i ];
+					m.skinning = true;
+					m.morphTargets = true;
+
+					m.specular.setHSL( 0, 0, 0.1 );
+
+					m.color.setHSL( 0.6, 0, 0.6 );
+
+				}
+
+				animation = new THREE.SkinnedMesh( geometry, materials );
+				animation.name = "Knight animation";
+				animation.position.set( x,-40, z );
+				animation.scale.set( s, s, s );
+				scene.add( animation );
+
+				animation.castShadow = true;
+				animation.receiveShadow = true;
+
+				helper = new THREE.SkeletonHelper( animation );
+				helper.material.linewidth = 3;
+				helper.visible = false;
+				scene.add( helper );
+
+				mixer = new THREE.AnimationMixer( animation );
+
+				bonesClip = geometry.animations[0];
+				facesClip = THREE.AnimationClip.CreateFromMorphTargetSequence( 'facialExpressions', animation.geometry.morphTargets, 3 );
+
+			
+
+			}
 
 
-/************************************Inicio animate***********************/
-function initTexture(manager) {
+	/************************************Inicio animate***********************/
+	function initTexture(manager) {
 
 	// instantiate a loader
 	var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
@@ -415,101 +537,52 @@ function initTexture(manager) {
 	cube.rotation.y=9;
 }
 /************************************Fim initMesshesFirstFase***********************/
+function drawPath(){
 
-function drawPath(count) {
-    var i;
-    var tubeGeometry;
-    for (i = 0; i < count; i += 3) {
-        vertices.push(new THREE.Vector3(pathCast[i], pathCast[i + 1], pathCast[i + 2]));
-    }
+	if(time < cordX.length){
+	controls.getObject().position.x =  cordX[time];
+	controls.getObject().position.z =  cordZ[time];
 
-    if (vertices.length == 0) {
-        return;
-    }
 
-    path = new THREE.CurvePath();
-
-    spline = new THREE.CatmullRomCurve3(vertices);
-    path.add(spline);
-
-    var geometry = new THREE.TubeGeometry( path, 20, 2, 8, false );
-	var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-	var mesh = new THREE.Mesh( geometry, material );
-	scene.add( mesh )
-    //addCameraToPath();
+	  if (isActiveAuto) {
+         cont++;
+         if (!(cont > 0 && cont < looptime)) {
+         	cont = 0;
+         }
+     }
+ }else{
+ 	isActiveAuto=false;
+ 	time=0;
+ }
 }
- 
- /*
-function addCameraToPath() {
-    var g = new THREE.SphereGeometry(1, 1),
-        m = new THREE.MeshBasicMaterial({color: 0xff0000});
-
-    cameraOnPath = new THREE.Mesh(g, m);
-    cameraOnPath.visible = false;
-    scene.add(cameraOnPath);
-    positionPathCamera();
-}
-
-function positionPathCamera() {
-    if (vertices.length == 0) {
-        return;
-    }
-
-    var time, t;
-
-    time = cont;
-
-
-    t = ( time % looptime ) / looptime;
-
-
-    var camPos = spline.getPoint(t);
-    var camRot = spline.getTangent(t);
-
-    controls.getObject().position.x = camPos.x;
-    controls.getObject().position.y = camPos.y;
-    controls.getObject().position.z = camPos.z;
-
-    controls.getObject().position.x = camRot.x;
-    controls.getObject().position.y = camRot.y;
-  	controls.getObject().position.z = camRot.z;
-	console.log(camPos);
-
-    //if (ANIMATE) {
-        camera.lookAt(spline.getPoint(t + (1 / 10000)));
-
-
-        cont++;
-        if (!(cont > 0 && cont < looptime)) {
-            cont = 0;
-        }
-    //} else if (!loaded) {
-        camera.lookAt(spline.getPoint(t + (1 / 10000)));
-   // }
-}
-
-
-*/
 /************************************Inicio animate***********************/
 function animate() {
-	
+
 	detectColision();
+	render();
 	requestAnimationFrame( animate );	
-	renderer.render(scene, camera);
+
 
 }
 /************************************Fim animate***********************/
 
 
+
+function render(){
+
+	renderer.render( scene, isActiveAuto === true ? camera : camera );
+
+}
+
 /************************************Inicio controls***********************/
-function listenControls(key) {
+function listenControls() {
 	if ((controls.enabled === true && controlsButtons === false) || (controls.enabled === false && controlsButtons === true)) {
 		var time = performance.now();
 		var delta = ( time - prevTime ) / 1000;
-
+		
+	
 		velocity.x -= velocity.x * 5.0 * delta;
 		velocity.z -= velocity.z * 5.0 * delta;
-
 		direction.z = Number( moveForward ) - Number( moveBackward );
 		direction.x = Number( moveLeft ) - Number( moveRight );
 		direction.normalize(); // this ensures consistent movements in all directions
@@ -517,11 +590,12 @@ function listenControls(key) {
 		//para a normalizar colocamos o player.speed entre 0 e 1 e temos que multiplicar por 2000 == valor Max
 		if ( moveForward || moveBackward ) velocity.z -= direction.z * player.speed * 2000 * delta;
 		if ( moveLeft || moveRight ) velocity.x -= direction.x * player.speed * 2000 * delta; 
-
+ 
 		controls.getObject().translateX( velocity.x * delta );
 		controls.getObject().translateY( velocity.y * delta );
 		controls.getObject().translateZ( velocity.z * delta );
 		prevTime = time;
+	
 	}
 }
 /************************************Fim controls***********************/
@@ -555,46 +629,51 @@ function detectColision() {
 	new THREE.Vector3(-1, 0, 0),
 	new THREE.Vector3(-1, 0, 1)
 	];
+    //         console.log(time + "-X" + controls.getObject().position.x+"K");
+	 		// console.log(time + "-Z" + controls.getObject().position.z+"K");
+	 		//  time++;
+  
+    count++;
+    player.raycaster = new THREE.Raycaster();
+    var i, collisions;
+    if((controls.getObject().position.x > 660 && controls.getObject().position.x < 670) || (controls.getObject().position.x < -694 && controls.getObject().position.x > - 704) || (controls.getObject().position.z > 850 && controls.getObject().position.z < 950 ) || (controls.getObject().position.z < -850 && controls.getObject().position.z > -950) ){
 
-	player.raycaster = new THREE.Raycaster();
-	var i, collisions;
-	if((controls.getObject().position.x > 660 && controls.getObject().position.x < 670) || (controls.getObject().position.x < -694 && controls.getObject().position.x > - 704) || (controls.getObject().position.z > 850 && controls.getObject().position.z < 950 ) || (controls.getObject().position.z < -850 && controls.getObject().position.z > -950) ){
+    	prev_pos_x = controls.getObject().position.x;
+    	prev_pos_z = controls.getObject().position.z;
+    }
+    if(controls.getObject().position.x > 670 || controls.getObject().position.x < -704 || controls.getObject().position.z > 950 || controls.getObject().position.z < -950 ){
 
-		prev_pos_x = controls.getObject().position.x;
-		prev_pos_z = controls.getObject().position.z;
-	}
-	if(controls.getObject().position.x > 670 || controls.getObject().position.x < -704 || controls.getObject().position.z > 950 || controls.getObject().position.z < -950 ){
+    	controls.getObject().position.x = prev_pos_x;
+    	controls.getObject().position.z = prev_pos_z;
+    }
 
-		controls.getObject().position.x = prev_pos_x;
-		controls.getObject().position.z = prev_pos_z;
-	}
+    for(i = 0; i<player.rays.length; i++){
+    	player.raycaster.set(controls.getObject().position, player.rays[i] );
+    	collisions = player.raycaster.intersectObjects(objects);
+    	if(collisions.length > 0){
 
-	for(i = 0; i<player.rays.length; i++){
-		player.raycaster.set(controls.getObject().position, player.rays[i] );
-		collisions = player.raycaster.intersectObjects(objects);
-		if(collisions.length > 0){
+    		if(collisions[0].distance > 4 && collisions[0].distance < 10){
+    			prev_pos_x = controls.getObject().position.x;
+    			prev_pos_z = controls.getObject().position.z;
+    		}
+    		if(collisions[0].distance < 3){
 
-			if(collisions[0].distance > 4 && collisions[0].distance < 10){
-				prev_pos_x = controls.getObject().position.x;
-				prev_pos_z = controls.getObject().position.z;
-			}
-			if(collisions[0].distance < 3){
-
-				controls.getObject().position.x = prev_pos_x;
-				controls.getObject().position.z = prev_pos_z;
-			}
-		}
-	}
+    			controls.getObject().position.x = prev_pos_x;
+    			controls.getObject().position.z = prev_pos_z;
+    		}
+    	}
+    }
 }
 /************************************Fim detectColision***********************/
 
-
+// cilpControl( gui, mixer, bonesClip, [ null, animation] );
+// clipControl( gui, mixer, facesClip, [ null, animation ] );
 /************************************Inicio initAudio***********************/
 function initAudio(){
 	// create an AudioListener and add it to the camera
 	var listener = new THREE.AudioListener();
 	camera.add( listener );
-
+	//splineCamera.add( listener);
 	// create a global audio source
 	sound = new THREE.Audio( listener );
 	// load a sound and set it as the Audio object's buffer
@@ -609,7 +688,7 @@ function initAudio(){
 /************************************Fim initAudio***********************/
 
 function translate() {
-    alert("A tradução ainda não foi implementada");
+	alert("A tradução ainda não foi implementada");
 }
 /************************************Inicio Fim Full Screen***********************/
 function openScreen() {

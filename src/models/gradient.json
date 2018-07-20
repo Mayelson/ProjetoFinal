@@ -36,7 +36,7 @@
         "mapDiffuse":"Grass0157_1_S.jpg",
         "mapDiffuseRepeat":[50,50],
         "shading":"phong",
-        "opacity":0.92,
+        "opacity":0.7,
         "visible":true,
         "colorDiffuse":[0.85,0.85,0.85],
         "doubleSided":false,
