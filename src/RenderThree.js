@@ -9,7 +9,7 @@ let areaHeight = 510;
 var keyboard = {};
 var objects = [];
 var valuesForReturns = {}; 
-var player = { width:60, height:8, speed: 0.2, turnSpeed:Math.PI*0.005 };
+var player = { width:60, height:8, speed: 0.03, turnSpeed:Math.PI*0.005 };
 var options = null;
 var isActiveAuto = false;
 var elementArea = null;
@@ -26,21 +26,18 @@ var velocity = new THREE.Vector3();
 var direction = new THREE.Vector3();
 var vertex = new THREE.Vector3();
 var color = new THREE.Color();
-var mixer, facesClip, bonesClip,helper;
-var time=0;
-var count=0;
-var binormal = new THREE.Vector3();
-var normal = new THREE.Vector3();
+
 var tube;
-var splineCamera;
 var parent;
-var cont = 1;
+var cont = 0;
 var looptime = 350000;
 var vertices = [];
 var path;
 var spline;
 var drenos;
+var camaraAuto;
 
+var mixer, facesClip, bonesClip,helper;
 
 /************************************Inicio initLoadingManager***********************/
 function initLoadingManager() {
@@ -155,9 +152,9 @@ function init() {
 	// Setup the camera
 	camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 200000);
 	//camera.position.set(player.width, player.height, -172);
-	//camera.lookAt(new THREE.Vector3(player.width, player.height, 0));
-	controls = new THREE.PointerLockControls(camera);
-	scene.add( controls.getObject());
+    ///camera.lookAt(new THREE.Vector3(player.width, player.height, 0));
+    controls = new THREE.PointerLockControls(camera);
+    scene.add( controls.getObject());
 
 	// Add the lights 
 	var light = new THREE.HemisphereLight( 0xffffff, 0xffffff, 1 );          
@@ -168,15 +165,6 @@ function init() {
 	parent = new THREE.Object3D();
 	scene.add( parent );
 
-	// splineCamera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.01, 200000 );
-	// controls = new THREE.PointerLockControls(splineCamera);
-	// parent.add( splineCamera );
-
-	// //splineCamera.position.x = cordX[0];
-	// splineCamera.position.y = 10;
-	//splineCamera.position.z = cordY[0];  
-
-
 	document.addEventListener( 'keydown', onKeyDown, false );
 	document.addEventListener( 'keyup', onKeyUp, false );						
 }
@@ -186,18 +174,7 @@ function onKeyDown( event ) {
 	switch ( event.keyCode ) {
 		// case 38: // up
 		case 87: // w
-		if(isActiveAuto==true){
-			//splineCamera.rotation.y = controls.getObject().rotation.y;
-			
-			time++;
-			time++;
-			time++;
-			time++;
-			time++;
-			time++;
-		drawPath();
-		}
-		    
+
 		return moveForward = true;
 
 		break;
@@ -287,11 +264,11 @@ function onKeyUp( event ) {
 			}).listen();
 			navigation.add(options.navigation, 'controlsButtons').onChange(function(){
 				if (controlsButtons === true ) {
+					
 					console.log("Disabled controls");
 					navegationButtonsElement.style.display = "none";
 					blocker.style.display = "block";
 					controlsButtons = false;
-
 				}else{
 
 					console.log("Activated controls");
@@ -308,15 +285,17 @@ function onKeyUp( event ) {
 					console.log("Disabled auto navigation");
 					isActiveAuto = false;
 				}else{
+					for(var i=0; i<cordX.length; i++){
+
+						if(cordX[i].length < 4){
+							cordX.splice(i, 1);
+
+
+						}
+						console.log(cordX[i]);
+					}
 					console.log("Activated auto navigation");
-
-				controls.getObject().position.x = cordX[0];				
-				controls.getObject().position.z = cordZ[0];  
-				controls.getObject().rotation.y = -2.0;
-
-				isActiveAuto = true;
-					
-
+					isActiveAuto = true;				
 				}
 			}).listen();
 
@@ -447,7 +426,19 @@ function onKeyUp( event ) {
 				loader.load( "../src/models/knight.json", addModelToScene20);
 				// After loading JSON from our file, we add it to the scene
 				function addModelToScene20( geometry, materials ) {
-						createScene( geometry, materials, 0, -40, -40, 5 );
+					//createScene( geometry, materials, 0, -40, -40, 5 );
+				}
+
+				loader.load("../SRC/models/camaraAuto.json", addModelToScene21);
+
+				function addModelToScene21(geometry, materials){
+					camaraAuto = new THREE.Mesh(geometry, materials);
+					camaraAuto.scale.set(40,40,40);
+					camaraAuto.position.x = -220;
+					camaraAuto.position.y = -40;
+					camaraAuto.position.z = -5;
+					scene.add(camaraAuto);
+
 				}
 
 
@@ -477,7 +468,7 @@ function onKeyUp( event ) {
 
 				geometry.computeBoundingBox();
 				var bb = geometry.boundingBox;
-			    for ( var i = 0; i < materials.length; i ++ ) {
+				for ( var i = 0; i < materials.length; i ++ ) {
 
 					var m = materials[ i ];
 					m.skinning = true;
@@ -508,13 +499,13 @@ function onKeyUp( event ) {
 				bonesClip = geometry.animations[0];
 				facesClip = THREE.AnimationClip.CreateFromMorphTargetSequence( 'facialExpressions', animation.geometry.morphTargets, 3 );
 
-			
+
 
 			}
 
 
-	/************************************Inicio animate***********************/
-	function initTexture(manager) {
+			/************************************Inicio animate***********************/
+			function initTexture(manager) {
 
 	// instantiate a loader
 	var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
@@ -539,39 +530,42 @@ function onKeyUp( event ) {
 /************************************Fim initMesshesFirstFase***********************/
 function drawPath(){
 
-	if(time < cordX.length){
-	controls.getObject().position.x =  cordX[time];
-	controls.getObject().position.z =  cordZ[time];
+	if(cont< cordX.length){
 
+		controls.enabled = false;
 
-	  if (isActiveAuto) {
-         cont++;
-         if (!(cont > 0 && cont < looptime)) {
-         	cont = 0;
-         }
-     }
- }else{
- 	isActiveAuto=false;
- 	time=0;
- }
+		controls.getObject().position.x = cordX[cont];
+		controls.getObject().position.z = cordZ[cont];
+		controls.getObject().rotation.y = rotY[cont];
+			// console.log(camaraAuto);
+			// controls.getObject().position.z = camaraAuto.geometry.vertices[cont].z * 5;		
+			cont++;
+		//	console.log(cont);
+	}else{
+		isActiveAuto=false;
+		controls.enabled = true;
+		cont=0;
+	}
 }
 /************************************Inicio animate***********************/
 function animate() {
 
 	detectColision();
 	render();
+	// console.log("X" + controls.getObject().position.x + "F");
+	// console.log("Z" + controls.getObject().position.z + "G");
+	// console.log('R' + controls.getObject().rotation.y + "H");
 	requestAnimationFrame( animate );	
-
-
 }
 /************************************Fim animate***********************/
 
 
 
 function render(){
-
-	renderer.render( scene, isActiveAuto === true ? camera : camera );
-
+	if (isActiveAuto) {
+		drawPath();
+	}
+	renderer.render( scene,  camera );
 }
 
 /************************************Inicio controls***********************/
@@ -580,7 +574,7 @@ function listenControls() {
 		var time = performance.now();
 		var delta = ( time - prevTime ) / 1000;
 		
-	
+		
 		velocity.x -= velocity.x * 5.0 * delta;
 		velocity.z -= velocity.z * 5.0 * delta;
 		direction.z = Number( moveForward ) - Number( moveBackward );
@@ -590,12 +584,12 @@ function listenControls() {
 		//para a normalizar colocamos o player.speed entre 0 e 1 e temos que multiplicar por 2000 == valor Max
 		if ( moveForward || moveBackward ) velocity.z -= direction.z * player.speed * 2000 * delta;
 		if ( moveLeft || moveRight ) velocity.x -= direction.x * player.speed * 2000 * delta; 
- 
+
 		controls.getObject().translateX( velocity.x * delta );
 		controls.getObject().translateY( velocity.y * delta );
 		controls.getObject().translateZ( velocity.z * delta );
 		prevTime = time;
-	
+
 	}
 }
 /************************************Fim controls***********************/
@@ -629,11 +623,9 @@ function detectColision() {
 	new THREE.Vector3(-1, 0, 0),
 	new THREE.Vector3(-1, 0, 1)
 	];
-    //         console.log(time + "-X" + controls.getObject().position.x+"K");
-	 		// console.log(time + "-Z" + controls.getObject().position.z+"K");
-	 		//  time++;
-  
-    count++;
+    //      
+
+
     player.raycaster = new THREE.Raycaster();
     var i, collisions;
     if((controls.getObject().position.x > 660 && controls.getObject().position.x < 670) || (controls.getObject().position.x < -694 && controls.getObject().position.x > - 704) || (controls.getObject().position.z > 850 && controls.getObject().position.z < 950 ) || (controls.getObject().position.z < -850 && controls.getObject().position.z > -950) ){
