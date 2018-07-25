@@ -39,7 +39,7 @@ var camaraAuto;
 var binormal = new THREE.Vector3();
 var normal = new THREE.Vector3();
 
-
+var crono = 0;
 var mixer, facesClip, bonesClip,helper;
 
 
@@ -166,42 +166,7 @@ function initLoadingManager() {
 }
 /************************************Fim initLoadingManager***********************/
 
-function pointerLock(){
-	var blocker = document.getElementById( 'blocker' );
-	var instructions = document.getElementById( 'instructions' );
-	var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
-	if ( havePointerLock ) {
 
-		var pointerlockchange = function ( event ) {
-			if ( document.pointerLockElement === elementArea || document.mozPointerLockElement === elementArea || document.webkitPointerLockElement === elementArea ) {
-				controls.enabled = true;
-				blocker.style.display = 'none';
-			} else {
-				controls.enabled = false;
-				blocker.style.display = 'block';
-				instructions.style.display = '';
-			}
-		};
-		var pointerlockerror = function ( event ) {
-			instructions.style.display = '';
-		};
-		// Hook pointer lock state change events
-		document.addEventListener( 'pointerlockchange', pointerlockchange, false );
-		document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
-		document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
-		document.addEventListener( 'pointerlockerror', pointerlockerror, false );
-		document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
-		document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
-		instructions.addEventListener( 'click', function ( event ) {
-			instructions.style.display = 'none';
-			// Ask the browser to lock the pointer
-			elementArea.requestPointerLock = elementArea.requestPointerLock || elementArea.mozRequestPointerLock || elementArea.webkitRequestPointerLock;
-			elementArea.requestPointerLock();
-		}, false );
-	} else {
-		instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
-	}
-}
 
 /************************************Inicio init***********************/
 function init() {
@@ -240,6 +205,45 @@ function init() {
 	document.addEventListener( 'keyup', onKeyUp, false );						
 }
 /************************************Fim init***********************/
+
+function pointerLock(){
+	var blocker = document.getElementById( 'blocker' );
+	var instructions = document.getElementById( 'instructions' );
+	var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
+	if ( havePointerLock ) {
+
+		var pointerlockchange = function ( event ) {
+			if ( document.pointerLockElement === elementArea || document.mozPointerLockElement === elementArea || document.webkitPointerLockElement === elementArea ) {
+				controls.enabled = true;
+				blocker.style.display = 'none';
+			} else {
+				controls.enabled = false;
+				blocker.style.display = 'block';
+				instructions.style.display = '';
+			}
+		};
+		var pointerlockerror = function ( event ) {
+			instructions.style.display = '';
+		};
+		// Hook pointer lock state change events
+		document.addEventListener( 'pointerlockchange', pointerlockchange, false );
+		document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
+		document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
+		document.addEventListener( 'pointerlockerror', pointerlockerror, false );
+		document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
+		document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
+		instructions.addEventListener( 'click', function ( event ) {
+			instructions.style.display = 'none';
+			// Ask the browser to lock the pointer
+			elementArea.requestPointerLock = elementArea.requestPointerLock || elementArea.mozRequestPointerLock || elementArea.webkitRequestPointerLock;
+			elementArea.requestPointerLock();
+		}, false );
+	} else {
+		instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
+	}
+}
+
+
 
 function onKeyDown( event ) {
 	switch ( event.keyCode ) {
@@ -352,21 +356,14 @@ function onKeyUp( event ) {
 			navigation.open();
 			navigation.add(options.navigation, 'autoNavigation').onChange(function(){
 				if (isActiveAuto === true ) {
-
+						
+					console.log(crono);
 					console.log("Disabled auto navigation");
 					isActiveAuto = false;
 				}else{
-					for(var i=0; i<cordX.length; i++){
-
-						if(cordX[i].length < 4){
-							cordX.splice(i, 1);
-
-
-						}
-						console.log(cordX[i]);
-					}
+					console.log(crono)
 					console.log("Activated auto navigation");
-					isActiveAuto = true;				
+					isActiveAuto = true;			
 				}
 			}).listen();
 
@@ -377,7 +374,7 @@ function onKeyUp( event ) {
 
 
 		/************************************Inicio initMesshesFirstFase***********************/
-		function initMesshesFirstFase() {
+function initMesshesFirstFase() {
 			var casaA, casaB, terreno, animation;
 			var arvore, arvore2, arvore3, arvore4,arvoreNova, arbustos, arvoreNova2;
 			var barraca;
@@ -541,50 +538,10 @@ function onKeyUp( event ) {
 		// cube.rotation.y=9;
 	}
 	/************************************Fim initMesshesFirstFase***********************/
-	function createScene( geometry, materials, x, y, z, s ) {
-
-				//ensureLoop( geometry.animation );
-
-				geometry.computeBoundingBox();
-				var bb = geometry.boundingBox;
-				for ( var i = 0; i < materials.length; i ++ ) {
-
-					var m = materials[ i ];
-					m.skinning = true;
-					m.morphTargets = true;
-
-					m.specular.setHSL( 0, 0, 0.1 );
-
-					m.color.setHSL( 0.6, 0, 0.6 );
-
-				}
-
-				animation = new THREE.SkinnedMesh( geometry, materials );
-				animation.name = "Knight animation";
-				animation.position.set( x,-40, z );
-				animation.scale.set( s, s, s );
-				scene.add( animation );
-
-				animation.castShadow = true;
-				animation.receiveShadow = true;
-
-				helper = new THREE.SkeletonHelper( animation );
-				helper.material.linewidth = 3;
-				helper.visible = false;
-				scene.add( helper );
-
-				mixer = new THREE.AnimationMixer( animation );
-
-				bonesClip = geometry.animations[0];
-				facesClip = THREE.AnimationClip.CreateFromMorphTargetSequence( 'facialExpressions', animation.geometry.morphTargets, 3 );
-
-
-
-			}
 
 
 			/************************************Inicio animate***********************/
-			function initTexture(manager) {
+function initTexture(manager) {
 
 	// instantiate a loader
 	var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
@@ -606,80 +563,97 @@ function onKeyUp( event ) {
 	scene.add( cube );
 	cube.rotation.y=9;
 }
+
+function eventWalk(key){
+	var event = { keyCode: key}
+	onKeyDown(event);
+}
+
+
+function eventWalkStop(key){
+	var event = { keyCode: key}
+	onKeyUp(event);
+}
+
 /************************************Fim initMesshesFirstFase***********************/
-function drawPath(){
 
 
-
-	var extrudePath = splines[ paramsPipe.spline ];
-
-	tubeGeometry = new THREE.TubeBufferGeometry( extrudePath, paramsPipe.extrusionSegments, 2, paramsPipe.radiusSegments, false );
-	  
-	addGeometry( tubeGeometry );
-
-
-			var time = Date.now();
-			var looptime = 20 * 9000;
-			var t = ( time % looptime ) / looptime;
-
-			var pos = tubeGeometry.parameters.path.getPointAt( t );
-			console.log(t);
-			// pos.multiplyScalar( params.scale );
-
-			var segments = tubeGeometry.tangents.length;
-			var pickt = t * segments;
-			var pick = Math.floor( pickt );
-			var pickNext = ( pick + 1 ) % segments;
-
-			binormal.subVectors( tubeGeometry.binormals[ pickNext ], tubeGeometry.binormals[ pick ] );
-			binormal.multiplyScalar( pickt - pick ).add( tubeGeometry.binormals[ pick ] );
-
-			var dir = tubeGeometry.parameters.path.getTangentAt( t );
-			var offset = 15;
-
-			//normal.copy( binormal ).cross( dir );
-			 pos.add( normal.clone().multiplyScalar( offset ) );
-
-			controls.getObject().position.copy(pos);
-			
-
-			var lookAt = tubeGeometry.parameters.path.getPointAt( ( t + 30 / tubeGeometry.parameters.path.getLength() ) % 1 ).multiplyScalar( params.scale );
-
-			 if ( ! params.lookAhead ) lookAt.copy( pos ).add( dir );
-			controls.getObject().matrix.lookAt( controls.getObject().position, lookAt, normal );
-			controls.getObject().rotation.setFromRotationMatrix( controls.getObject().matrix, controls.getObject().rotation.order );
-
-		}
-
-		function addGeometry( geometry ) {
-
-			// 3D shape
-			controls.enabled = false;
-			var mesh = new THREE.Mesh( geometry, materialPipe );
-			var wireframe = new THREE.Mesh( geometry, wireframeMaterial );
-			mesh.add( wireframe );
-			//mesh.visible = false;
-			parent.add( mesh );
-
-		}
 		/************************************Inicio animate***********************/
-		function animate() {
+function animate() {
 
-			detectColision();
-			render();
-			// console.log("X" + controls.getObject().position.x);
-			// console.log("Z" + controls.getObject().position.z);
+	render();
+	detectColision();
+	if(isActiveAuto === true){
+	crono++;
+	drawPath();
+	}else{
+		crono = 0;
+	} 
+	// console.log("X" + controls.getObject().position.x);
+	// console.log("Z" + controls.getObject().position.z);
 	// console.log('R' + controls.getObject().rotation.y + "H");
 	requestAnimationFrame( animate );	
 }
 /************************************Fim animate***********************/
 
+function drawPath(){
+
+	
+	var extrudePath = splines[ paramsPipe.spline ];
+	tubeGeometry = new THREE.TubeBufferGeometry( extrudePath, paramsPipe.extrusionSegments, 2, paramsPipe.radiusSegments, false );
+	addGeometry( tubeGeometry );
+	animationCamera();
+
+}
+function addGeometry( geometry ){
+		
+	// 3D shape
+	controls.enabled = false;
+	var mesh = new THREE.Mesh( geometry, materialPipe );
+	var wireframe = new THREE.Mesh( geometry, wireframeMaterial );
+	mesh.add( wireframe );
+	mesh.visible = false;
+	parent.add( mesh );
+
+}
+
+
+function animationCamera(){
+
+	var looptime = 10 * 2000;
+	var t = ( crono % looptime ) / looptime;
+
+	
+	var pos = tubeGeometry.parameters.path.getPointAt( t );
+	console.log(crono);
+			// pos.multiplyScalar( params.scale );
+	var segments = tubeGeometry.tangents.length;
+	var pickt = t * segments;
+	var pick = Math.floor( pickt );
+	var pickNext = ( pick + 1 ) % segments;
+
+	binormal.subVectors( tubeGeometry.binormals[ pickNext ], tubeGeometry.binormals[ pick ] );
+	binormal.multiplyScalar( pickt - pick ).add( tubeGeometry.binormals[ pick ] );
+
+    var dir = tubeGeometry.parameters.path.getTangentAt( t );
+	var offset = 15;
+
+			//normal.copy( binormal ).cross( dir );
+	pos.add( normal.clone().multiplyScalar( offset ) );
+
+	controls.getObject().position.copy(pos);
+			
+
+	var lookAt = tubeGeometry.parameters.path.getPointAt( ( t + 30 / tubeGeometry.parameters.path.getLength() ) % 1 ).multiplyScalar( params.scale );
+
+	if ( ! params.lookAhead ) lookAt.copy( pos ).add( dir );
+	controls.getObject().matrix.lookAt( controls.getObject().position, lookAt, normal );
+	controls.getObject().rotation.setFromRotationMatrix( controls.getObject().matrix, controls.getObject().rotation.order );
+}
 
 
 function render(){
-	if (isActiveAuto) {
-		drawPath();
-	}
+	
 	renderer.render( scene,  camera );
 }
 
@@ -707,19 +681,6 @@ function listenControls() {
 	}
 }
 /************************************Fim controls***********************/
-
-
-function eventWalk(key){
-	var event = { keyCode: key}
-	onKeyDown(event);
-}
-
-
-function eventWalkStop(key){
-	var event = { keyCode: key}
-	onKeyUp(event);
-}
-
 
 /************************************Inicio detectColision***********************/
 function detectColision() {

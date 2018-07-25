@@ -14,7 +14,7 @@
         "depthTest":true,
         "DbgColor":15658734,
         "DbgName":"Material.001",
-        "opacity":0.3,
+        "opacity":0.9,
         "colorDiffuse":[0.24,0.24,0.24],
         "depthWrite":true
     }],
