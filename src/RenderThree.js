@@ -9,7 +9,7 @@ let areaHeight = 510;
 var keyboard = {};
 var objects = [];
 var valuesForReturns = {}; 
-var player = { width:60, height:8, speed: 0.03, turnSpeed:Math.PI*0.005 };
+var player = { width:60, height:8, speed: 0.25, turnSpeed:Math.PI*0.005 };
 var options = null;
 var isActiveAuto = false;
 var elementArea = null;
@@ -36,9 +36,77 @@ var path;
 var spline;
 var drenos;
 var camaraAuto;
+var binormal = new THREE.Vector3();
+var normal = new THREE.Vector3();
+
 
 var mixer, facesClip, bonesClip,helper;
 
+
+var pipeSpline = new THREE.CatmullRomCurve3( [
+	new THREE.Vector3( -229,0, -165 ),
+	new THREE.Vector3(142,0, -165 ),
+	new THREE.Vector3(243,0, -121 ),
+	new THREE.Vector3(282,0, -231),
+	new THREE.Vector3(132,0, -178),
+	new THREE.Vector3(70,0, -197),
+	new THREE.Vector3(90,0, -291), 
+	new THREE.Vector3(291,0, -291),
+	new THREE.Vector3(291, 0, -310),
+	new THREE.Vector3(43, 0, -310),
+	new THREE.Vector3(43, 0, -210),
+	new THREE.Vector3(-270, 0, -160),
+	//casa2
+	new THREE.Vector3( -275, 0, 400 ),
+	new THREE.Vector3( 40, 0, 395 ),
+	new THREE.Vector3( 105, 0, 411 ),
+	new THREE.Vector3( 217, 0, 432 ),
+	new THREE.Vector3( 290, 0, 465 ),
+	new THREE.Vector3( 310, 0, 223 ),
+	new THREE.Vector3( 310, 0, 170 ), 
+	new THREE.Vector3( 155, 0, 170 ), 
+	new THREE.Vector3( 155, 0, 215 ),
+	new THREE.Vector3( 200, 0, 215 ),
+	new THREE.Vector3( 270, 0, 190), 
+	new THREE.Vector3( 300, 0, 310),
+	new THREE.Vector3( 90, 0, 340),
+	new THREE.Vector3( 80, 0, 160),
+	new THREE.Vector3( 30, 0, 160),
+	new THREE.Vector3( 30, 0, 190),
+	new THREE.Vector3( 60, 0, 244 ),
+	new THREE.Vector3( 55, 0, 375 ),
+	new THREE.Vector3( -150, 0, 375)
+	] );
+
+var paramsPipe = {
+	spline: 'PipeSpline',
+	scale: 4,
+	extrusionSegments: 100,
+	radiusSegments: 3,
+	closed: true,
+	animationView: false,
+	lookAhead: false,
+	cameraHelper: false,
+};
+
+var materialPipe = new THREE.MeshLambertMaterial( { color: 0xff00ff } );
+
+var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.3, wireframe: true, transparent: true } );
+
+var splines = {
+	
+	PipeSpline: pipeSpline,
+	SampleClosedSpline: sampleClosedSpline
+};
+var tubeGeometry;
+
+var sampleClosedSpline = new THREE.CatmullRomCurve3( [
+	new THREE.Vector3( 0, -40, -40 ),
+	new THREE.Vector3( 0, 40, -40 ),
+	new THREE.Vector3( 0, 140, -40 ),
+	new THREE.Vector3( 0, 40, 40 ),
+	new THREE.Vector3( 0, -40, 40 )
+	] );
 /************************************Inicio initLoadingManager***********************/
 function initLoadingManager() {
 
@@ -162,8 +230,11 @@ function init() {
 	scene.add( light );
 
 
+
 	parent = new THREE.Object3D();
 	scene.add( parent );
+
+
 
 	document.addEventListener( 'keydown', onKeyDown, false );
 	document.addEventListener( 'keyup', onKeyUp, false );						
@@ -314,6 +385,7 @@ function onKeyUp( event ) {
 			var scale = 2;
 			const manager = initLoadingManager();
 			const loader = new THREE.JSONLoader(manager);
+			const loaderFbx = new THREE.JSONLoader(manager);
 			var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
 			//primeira fase
 			if (fase == 1) {
@@ -429,17 +501,24 @@ function onKeyUp( event ) {
 					//createScene( geometry, materials, 0, -40, -40, 5 );
 				}
 
-				loader.load("../SRC/models/camaraAuto.json", addModelToScene21);
+				// loader.load( '../src/js/paths/percurssoAutoTeste.fbx', function ( object ) {
 
-				function addModelToScene21(geometry, materials){
-					camaraAuto = new THREE.Mesh(geometry, materials);
-					camaraAuto.scale.set(40,40,40);
-					camaraAuto.position.x = -220;
-					camaraAuto.position.y = -40;
-					camaraAuto.position.z = -5;
-					scene.add(camaraAuto);
+				// 	console.log (object);
+				// 	// object.mixer = new THREE.AnimationMixer( object );
+				// 	// mixers.push( object.mixer );
+				// 	// //var action = object.mixer.clipAction( object.animations[ 0 ] );
+				// 	// //action.play();
+				// 	// console.log(object);
+				// 	// // object.traverse( function ( child ) {
+				// 	// // 	if ( child.isMesh ) {
+				// 	// // 		child.castShadow = true;
+				// 	// // 		child.receiveShadow = true;
+				// 	// // 	}
+				// 	// // } );
+				// 	//scene.add( object );
+				// } );
 
-				}
+
 
 
 			} else if (fase == 2) {
@@ -530,30 +609,66 @@ function onKeyUp( event ) {
 /************************************Fim initMesshesFirstFase***********************/
 function drawPath(){
 
-	if(cont< cordX.length){
 
-		controls.enabled = false;
 
-		controls.getObject().position.x = cordX[cont];
-		controls.getObject().position.z = cordZ[cont];
-		controls.getObject().rotation.y = rotY[cont];
-			// console.log(camaraAuto);
-			// controls.getObject().position.z = camaraAuto.geometry.vertices[cont].z * 5;		
-			cont++;
-		//	console.log(cont);
-	}else{
-		isActiveAuto=false;
-		controls.enabled = true;
-		cont=0;
-	}
-}
-/************************************Inicio animate***********************/
-function animate() {
+	var extrudePath = splines[ paramsPipe.spline ];
 
-	detectColision();
-	render();
-	// console.log("X" + controls.getObject().position.x + "F");
-	// console.log("Z" + controls.getObject().position.z + "G");
+	tubeGeometry = new THREE.TubeBufferGeometry( extrudePath, paramsPipe.extrusionSegments, 2, paramsPipe.radiusSegments, false );
+	  
+	addGeometry( tubeGeometry );
+
+
+			var time = Date.now();
+			var looptime = 20 * 9000;
+			var t = ( time % looptime ) / looptime;
+
+			var pos = tubeGeometry.parameters.path.getPointAt( t );
+			console.log(t);
+			// pos.multiplyScalar( params.scale );
+
+			var segments = tubeGeometry.tangents.length;
+			var pickt = t * segments;
+			var pick = Math.floor( pickt );
+			var pickNext = ( pick + 1 ) % segments;
+
+			binormal.subVectors( tubeGeometry.binormals[ pickNext ], tubeGeometry.binormals[ pick ] );
+			binormal.multiplyScalar( pickt - pick ).add( tubeGeometry.binormals[ pick ] );
+
+			var dir = tubeGeometry.parameters.path.getTangentAt( t );
+			var offset = 15;
+
+			//normal.copy( binormal ).cross( dir );
+			 pos.add( normal.clone().multiplyScalar( offset ) );
+
+			controls.getObject().position.copy(pos);
+			
+
+			var lookAt = tubeGeometry.parameters.path.getPointAt( ( t + 30 / tubeGeometry.parameters.path.getLength() ) % 1 ).multiplyScalar( params.scale );
+
+			 if ( ! params.lookAhead ) lookAt.copy( pos ).add( dir );
+			controls.getObject().matrix.lookAt( controls.getObject().position, lookAt, normal );
+			controls.getObject().rotation.setFromRotationMatrix( controls.getObject().matrix, controls.getObject().rotation.order );
+
+		}
+
+		function addGeometry( geometry ) {
+
+			// 3D shape
+			controls.enabled = false;
+			var mesh = new THREE.Mesh( geometry, materialPipe );
+			var wireframe = new THREE.Mesh( geometry, wireframeMaterial );
+			mesh.add( wireframe );
+			//mesh.visible = false;
+			parent.add( mesh );
+
+		}
+		/************************************Inicio animate***********************/
+		function animate() {
+
+			detectColision();
+			render();
+			// console.log("X" + controls.getObject().position.x);
+			// console.log("Z" + controls.getObject().position.z);
 	// console.log('R' + controls.getObject().rotation.y + "H");
 	requestAnimationFrame( animate );	
 }
@@ -573,7 +688,6 @@ function listenControls() {
 	if ((controls.enabled === true && controlsButtons === false) || (controls.enabled === false && controlsButtons === true)) {
 		var time = performance.now();
 		var delta = ( time - prevTime ) / 1000;
-		
 		
 		velocity.x -= velocity.x * 5.0 * delta;
 		velocity.z -= velocity.z * 5.0 * delta;
