@@ -99,7 +99,7 @@ var splines = {
 	SampleClosedSpline: sampleClosedSpline
 };
 var tubeGeometry;
-
+var clock = new THREE.Clock();
 var sampleClosedSpline = new THREE.CatmullRomCurve3( [
 	new THREE.Vector3( 0, -40, -40 ),
 	new THREE.Vector3( 0, 40, -40 ),
@@ -356,7 +356,7 @@ function onKeyUp( event ) {
 			navigation.open();
 			navigation.add(options.navigation, 'autoNavigation').onChange(function(){
 				if (isActiveAuto === true ) {
-						
+					
 					console.log(crono);
 					console.log("Disabled auto navigation");
 					isActiveAuto = false;
@@ -374,7 +374,7 @@ function onKeyUp( event ) {
 
 
 		/************************************Inicio initMesshesFirstFase***********************/
-function initMesshesFirstFase() {
+		function initMesshesFirstFase() {
 			var casaA, casaB, terreno, animation;
 			var arvore, arvore2, arvore3, arvore4,arvoreNova, arbustos, arvoreNova2;
 			var barraca;
@@ -490,32 +490,19 @@ function initMesshesFirstFase() {
 					scene.add(drenos);
 
 				}
+				
 
+				new THREE.ObjectLoader().load( "../src/models/pump.json", function ( model ) {
+					model.scale.set(1,1,1);
+					model.position.y = -40;
+					model.position.z = -500;
+					model.position.x = -400;
+					// scene.add( model );
+					mixer = new THREE.AnimationMixer( model );
+					mixer.clipAction( model.animations[ 0 ] ).play();
 
-				loader.load( "../src/models/knight.json", addModelToScene20);
-				// After loading JSON from our file, we add it to the scene
-				function addModelToScene20( geometry, materials ) {
-					//createScene( geometry, materials, 0, -40, -40, 5 );
-				}
-
-				// loader.load( '../src/js/paths/percurssoAutoTeste.fbx', function ( object ) {
-
-				// 	console.log (object);
-				// 	// object.mixer = new THREE.AnimationMixer( object );
-				// 	// mixers.push( object.mixer );
-				// 	// //var action = object.mixer.clipAction( object.animations[ 0 ] );
-				// 	// //action.play();
-				// 	// console.log(object);
-				// 	// // object.traverse( function ( child ) {
-				// 	// // 	if ( child.isMesh ) {
-				// 	// // 		child.castShadow = true;
-				// 	// // 		child.receiveShadow = true;
-				// 	// // 	}
-				// 	// // } );
-				// 	//scene.add( object );
-				// } );
-
-
+				    animate();
+			} );
 
 
 			} else if (fase == 2) {
@@ -540,8 +527,8 @@ function initMesshesFirstFase() {
 	/************************************Fim initMesshesFirstFase***********************/
 
 
-			/************************************Inicio animate***********************/
-function initTexture(manager) {
+	/************************************Inicio animate***********************/
+	function initTexture(manager) {
 
 	// instantiate a loader
 	var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
@@ -578,14 +565,15 @@ function eventWalkStop(key){
 /************************************Fim initMesshesFirstFase***********************/
 
 
-		/************************************Inicio animate***********************/
+/************************************Inicio animate***********************/
 function animate() {
 
+	mixer.update( clock.getDelta() );
 	render();
 	detectColision();
 	if(isActiveAuto === true){
-	crono++;
-	drawPath();
+		crono++;
+		drawPath();
 	}else{
 		crono = 0;
 	} 
@@ -606,7 +594,7 @@ function drawPath(){
 
 }
 function addGeometry( geometry ){
-		
+	
 	// 3D shape
 	controls.enabled = false;
 	var mesh = new THREE.Mesh( geometry, materialPipe );
@@ -620,53 +608,53 @@ function addGeometry( geometry ){
 
 function animationCamera(){
 
-	var looptime = 10 * 2000;
+	var looptime = 10 * 1000;
 	var t = ( crono % looptime ) / looptime;
 
 	
 	var pos = tubeGeometry.parameters.path.getPointAt( t );
 	console.log(crono);
 			// pos.multiplyScalar( params.scale );
-	var segments = tubeGeometry.tangents.length;
-	var pickt = t * segments;
-	var pick = Math.floor( pickt );
-	var pickNext = ( pick + 1 ) % segments;
+			var segments = tubeGeometry.tangents.length;
+			var pickt = t * segments;
+			var pick = Math.floor( pickt );
+			var pickNext = ( pick + 1 ) % segments;
 
-	binormal.subVectors( tubeGeometry.binormals[ pickNext ], tubeGeometry.binormals[ pick ] );
-	binormal.multiplyScalar( pickt - pick ).add( tubeGeometry.binormals[ pick ] );
+			binormal.subVectors( tubeGeometry.binormals[ pickNext ], tubeGeometry.binormals[ pick ] );
+			binormal.multiplyScalar( pickt - pick ).add( tubeGeometry.binormals[ pick ] );
 
-    var dir = tubeGeometry.parameters.path.getTangentAt( t );
-	var offset = 15;
+			var dir = tubeGeometry.parameters.path.getTangentAt( t );
+			var offset = 15;
 
 			//normal.copy( binormal ).cross( dir );
-	pos.add( normal.clone().multiplyScalar( offset ) );
+			pos.add( normal.clone().multiplyScalar( offset ) );
 
-	controls.getObject().position.copy(pos);
+			controls.getObject().position.copy(pos);
 			
 
-	var lookAt = tubeGeometry.parameters.path.getPointAt( ( t + 30 / tubeGeometry.parameters.path.getLength() ) % 1 ).multiplyScalar( params.scale );
+			var lookAt = tubeGeometry.parameters.path.getPointAt( ( t + 30 / tubeGeometry.parameters.path.getLength() ) % 1 ).multiplyScalar( params.scale );
 
-	if ( ! params.lookAhead ) lookAt.copy( pos ).add( dir );
-	controls.getObject().matrix.lookAt( controls.getObject().position, lookAt, normal );
-	controls.getObject().rotation.setFromRotationMatrix( controls.getObject().matrix, controls.getObject().rotation.order );
-}
+			if ( ! params.lookAhead ) lookAt.copy( pos ).add( dir );
+			controls.getObject().matrix.lookAt( controls.getObject().position, lookAt, normal );
+			controls.getObject().rotation.setFromRotationMatrix( controls.getObject().matrix, controls.getObject().rotation.order );
+		}
 
 
-function render(){
-	
-	renderer.render( scene,  camera );
-}
+		function render(){
+			
+			renderer.render( scene,  camera );
+		}
 
-/************************************Inicio controls***********************/
-function listenControls() {
-	if ((controls.enabled === true && controlsButtons === false) || (controls.enabled === false && controlsButtons === true)) {
-		var time = performance.now();
-		var delta = ( time - prevTime ) / 1000;
-		
-		velocity.x -= velocity.x * 5.0 * delta;
-		velocity.z -= velocity.z * 5.0 * delta;
-		direction.z = Number( moveForward ) - Number( moveBackward );
-		direction.x = Number( moveLeft ) - Number( moveRight );
+		/************************************Inicio controls***********************/
+		function listenControls() {
+			if ((controls.enabled === true && controlsButtons === false) || (controls.enabled === false && controlsButtons === true)) {
+				var time = performance.now();
+				var delta = ( time - prevTime ) / 1000;
+				
+				velocity.x -= velocity.x * 5.0 * delta;
+				velocity.z -= velocity.z * 5.0 * delta;
+				direction.z = Number( moveForward ) - Number( moveBackward );
+				direction.x = Number( moveLeft ) - Number( moveRight );
 		direction.normalize(); // this ensures consistent movements in all directions
 
 		//para a normalizar colocamos o player.speed entre 0 e 1 e temos que multiplicar por 2000 == valor Max
