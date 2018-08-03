@@ -36,13 +36,25 @@
 		</div>
 	</div>
 
-	<div id="blocker">
 
+	<div id="blocker">
 		<div id="instructions">
 			<span style="font-size:40px">Click to play</span>
 			<br />
 			(W, A, S, D = Mover, MOUSE = Olhar em volta)
-		</div>
+		</div>		
+	</div>
+
+	<div id="modelsInfo">
+
+		<span style="font-size:40px">Press Enter</span>
+		
+			<img id="imgCasaA" class="imgModels" name="CasaA" style="display: none;"  src="src/textures/texto_2048_casaGuarda.png" alt="Italian Trulli width="700" height="400">
+			<img id="imgCasaB" name="CasaB" style="display: none;"  src="src/textures/texto_2048_igreja.png" alt="Italian Trulli width="700" height="400">
+
+
+
+			
 	</div>
 
 	<div id="area">
@@ -86,10 +98,14 @@
 						<h5>Outras</h5>
 						<p>Click no botão inferior direito para activar ou desativar o ecrão inteiro</p>
 						<p>Para sair do ecrã inteiro também pode pressionar a tecla "ESC"</p>
+
 					</div>
+
 				</div>
 			</div>
 		</div>
+		
+
 
 		<div id="btnNavigationWalk">
 			&emsp;&emsp;&emsp;&emsp;&emsp;<button id="btnW" title="Mover em Frente" class="op" onmousedown="eventWalk(87)" onmouseup="eventWalkStop(87)">W</button><br>
@@ -98,6 +114,7 @@
 		
 		<button id="btnFullScreen" class="fas fa-arrows-alt op" title="Ecrã Inteiro" onclick="openScreen()"></button>
 	</div>
+	<div id="tracker"></div>
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>	
@@ -173,6 +190,8 @@ body {
 	margin: 0;
 }
 
+
+
 .op{
 	margin: 20px;
 	background-color: #841818;
@@ -198,7 +217,16 @@ body {
 	display: none;
 }
 
+#modelsInfo{
+width: 100%;
+height: 100%;
+position: absolute;
+color: rgba(0,0,0,0.5);
+text-align: center;
+cursor: pointer;
+margin-bottom: 40px;
 
+}
 
 #btnFullScreen{
 	position: absolute;
@@ -237,6 +265,15 @@ body {
 	height: 100%;
 	background-color: rgba(0,0,0,0.5);
 }
+
+
+.imgModels{
+color: rgba(0,0,0,0.5);
+margin-top: 30px;
+margin-left: 380px;
+}
+
+
 .modal-header{
 	background-color: #1676F9;
 }

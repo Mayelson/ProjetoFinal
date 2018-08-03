@@ -14,7 +14,14 @@ var options = null;
 var isActiveAuto = false;
 var elementArea = null;
 var controlsButtons = false;
+var semaforo = 0;
 
+var RADIUS = 20;
+var x = 50;
+var y = 50;
+
+var lastSprite;
+var sprites=[];
 var raycaster;
 var moveForward = false;
 var moveBackward = false;
@@ -209,23 +216,34 @@ function init() {
 function pointerLock(){
 	var blocker = document.getElementById( 'blocker' );
 	var instructions = document.getElementById( 'instructions' );
+	
+
 	var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
 	if ( havePointerLock ) {
 
 		var pointerlockchange = function ( event ) {
+
+			
 			if ( document.pointerLockElement === elementArea || document.mozPointerLockElement === elementArea || document.webkitPointerLockElement === elementArea ) {
 				controls.enabled = true;
+
 				blocker.style.display = 'none';
-			} else {
-				controls.enabled = false;
-				blocker.style.display = 'block';
-				instructions.style.display = '';
-			}
-		};
-		var pointerlockerror = function ( event ) {
-			instructions.style.display = '';
-		};
+				console.log('The pointer lock status is now locked');
+   				
+
+   				} else {
+   					controls.enabled = false;
+   					blocker.style.display = 'block';
+   					instructions.style.display = '';
+   					console.log('The pointer lock status is now unlocked');  
+    		
+    		}
+    	};
+    	var pointerlockerror = function ( event ) {
+    		instructions.style.display = '';
+    	};
 		// Hook pointer lock state change events
+
 		document.addEventListener( 'pointerlockchange', pointerlockchange, false );
 		document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
 		document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
@@ -241,7 +259,21 @@ function pointerLock(){
 	} else {
 		instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
 	}
+
 }
+
+function displayText(sprite){
+
+	
+	
+	//controls.enabled=false;
+    //blocker.style.display = 'block';
+	//infoModelos.style.display = 'block';
+
+
+
+}
+
 
 
 
@@ -372,18 +404,65 @@ function onKeyUp( event ) {
 		/************************************Fim guiData***********************/
 
 
+				// placas
+				function centroid(mesh) {
 
-		/************************************Inicio initMesshesFirstFase***********************/
-		function initMesshesFirstFase() {
-			var casaA, casaB, terreno, animation;
-			var arvore, arvore2, arvore3, arvore4,arvoreNova, arbustos, arvoreNova2;
-			var barraca;
-			var max_displacement = 0.2;
-			var scale = 2;
-			const manager = initLoadingManager();
-			const loader = new THREE.JSONLoader(manager);
-			const loaderFbx = new THREE.JSONLoader(manager);
-			var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
+					var centroidAux = new THREE.Vector3();
+					for (var i = 0, l = mesh.geometry.vertices.length; i < l; i++) {
+						centroidAux.add(mesh.geometry.vertices[i]);
+					}
+					centroidAux.divideScalar(mesh.geometry.vertices.length);
+
+					return centroidAux;
+				}
+
+				function loadText(mesh) {
+
+					var texture;
+
+					switch (mesh.name) {
+						case 'CasaB':
+						texture = new THREE.TextureLoader().load("../src/textures/texto_2048_casaGuarda.png");
+						break;
+						case 'CasaA':
+						texture = new THREE.TextureLoader().load("../src/textures/texto_2048_igreja.png");
+						break;
+
+						default:
+						texture = new THREE.TextureLoader().load("textures/texto_2048_error.png");
+						break;
+					}
+
+					var spriteMaterial;
+					spriteMaterial = new THREE.SpriteMaterial({map: texture, color: 0xffffff});
+
+					var sprite = new THREE.Sprite(spriteMaterial);
+					sprite.scale.set(40, 40, 40);
+
+					var centroidAux = centroid(mesh);
+    //console.log(centroid(mesh));
+
+    sprite.name = mesh.name;
+    sprites.push(sprite);
+}
+
+
+
+
+
+				// FIM PLACAS
+
+				/************************************Inicio initMesshesFirstFase***********************/
+				function initMesshesFirstFase() {
+					var casaA, casaB, terreno, animation;
+					var arvore, arvore2, arvore3, arvore4,arvoreNova, arbustos, arvoreNova2;
+					var barraca;
+					var max_displacement = 0.2;
+					var scale = 2;
+					const manager = initLoadingManager();
+					const loader = new THREE.JSONLoader(manager);
+					const loaderFbx = new THREE.JSONLoader(manager);
+					var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
 			//primeira fase
 			if (fase == 1) {
 				loader.load( "../src/models/buildA.json", addModelToScene, manager.onProgress, manager.onError);
@@ -394,6 +473,8 @@ function onKeyUp( event ) {
 					casaA.position.y = -40;
 					casaA.position.z = -20;
 					casaA.position.x = -210;
+					casaA.name = "CasaA";
+					loadText(casaA);
 					scene.add( casaA );
 					objects.push(casaA);
 				}
@@ -406,7 +487,8 @@ function onKeyUp( event ) {
 					casaB.position.y = -40;
 					casaB.position.z = 0;
 					casaB.position.x = -220;
-					casaB.name = "casaB";
+					casaB.name = "CasaB";
+					loadText(casaB);
 					scene.add( casaB );
 					objects.push(casaB);
 				}
@@ -419,7 +501,7 @@ function onKeyUp( event ) {
 					arvoreNova.position.y = -40;
 					arvoreNova.position.z = 200;
 					arvoreNova.position.x = -550;
-					arvoreNova.name = "arvoreNova";
+					arvoreNova.name = "arvore9";
 					scene.add( arvoreNova );
 					objects.push(arvoreNova);
 				}
@@ -432,7 +514,7 @@ function onKeyUp( event ) {
 					arvoreNova2.position.y = -40;
 					arvoreNova2.position.z = 600;
 					arvoreNova2.position.x = -550;
-					arvoreNova2.name = "arvoreNova";
+					arvoreNova2.name = "arvore10";
 					scene.add( arvoreNova2 );
 					objects.push(arvoreNova2);
 				}
@@ -501,8 +583,8 @@ function onKeyUp( event ) {
 					mixer = new THREE.AnimationMixer( model );
 					mixer.clipAction( model.animations[ 0 ] ).play();
 
-				    animate();
-			} );
+					animate();
+				} );
 
 
 			} else if (fase == 2) {
@@ -568,7 +650,7 @@ function eventWalkStop(key){
 /************************************Inicio animate***********************/
 function animate() {
 
-	mixer.update( clock.getDelta() );
+	//mixer.update( clock.getDelta() );
 	render();
 	detectColision();
 	if(isActiveAuto === true){
@@ -672,8 +754,16 @@ function animationCamera(){
 
 /************************************Inicio detectColision***********************/
 function detectColision() {
+
+
+
+
 	var prev_pos_x = controls.getObject().position.x;
 	var prev_pos_z = controls.getObject().position.z;
+	var infoDoc = document.getElementById('modelsInfo');
+	var imgCasaA = document.getElementById('imgCasaA');
+	var imgCasaB = document.getElementById('imgCasaB');
+	
 	player.mesh = new THREE.Object3D();
 	listenControls();
 	player.rays = [
@@ -686,39 +776,99 @@ function detectColision() {
 	new THREE.Vector3(-1, 0, 0),
 	new THREE.Vector3(-1, 0, 1)
 	];
-    //      
 
 
-    player.raycaster = new THREE.Raycaster();
-    var i, collisions;
-    if((controls.getObject().position.x > 660 && controls.getObject().position.x < 670) || (controls.getObject().position.x < -694 && controls.getObject().position.x > - 704) || (controls.getObject().position.z > 850 && controls.getObject().position.z < 950 ) || (controls.getObject().position.z < -850 && controls.getObject().position.z > -950) ){
 
-    	prev_pos_x = controls.getObject().position.x;
-    	prev_pos_z = controls.getObject().position.z;
-    }
-    if(controls.getObject().position.x > 670 || controls.getObject().position.x < -704 || controls.getObject().position.z > 950 || controls.getObject().position.z < -950 ){
+	player.raycaster = new THREE.Raycaster();
+	var i, collisions;
+	if((controls.getObject().position.x > 660 && controls.getObject().position.x < 670) || (controls.getObject().position.x < -694 && controls.getObject().position.x > - 704) || (controls.getObject().position.z > 850 && controls.getObject().position.z < 950 ) || (controls.getObject().position.z < -850 && controls.getObject().position.z > -950) ){
 
-    	controls.getObject().position.x = prev_pos_x;
-    	controls.getObject().position.z = prev_pos_z;
-    }
+		prev_pos_x = controls.getObject().position.x;
+		prev_pos_z = controls.getObject().position.z;
+	}
+	if(controls.getObject().position.x > 670 || controls.getObject().position.x < -704 || controls.getObject().position.z > 950 || controls.getObject().position.z < -950 ){
 
-    for(i = 0; i<player.rays.length; i++){
-    	player.raycaster.set(controls.getObject().position, player.rays[i] );
-    	collisions = player.raycaster.intersectObjects(objects);
-    	if(collisions.length > 0){
+		controls.getObject().position.x = prev_pos_x;
+		controls.getObject().position.z = prev_pos_z;
+	}
 
-    		if(collisions[0].distance > 4 && collisions[0].distance < 10){
-    			prev_pos_x = controls.getObject().position.x;
-    			prev_pos_z = controls.getObject().position.z;
-    		}
-    		if(collisions[0].distance < 3){
+	for(i = 0; i<player.rays.length; i++){
+		player.raycaster.set(controls.getObject().position, player.rays[i] );
+		collisions = player.raycaster.intersectObjects(objects);
 
-    			controls.getObject().position.x = prev_pos_x;
-    			controls.getObject().position.z = prev_pos_z;
-    		}
-    	}
-    }
+
+		if(collisions.length > 0){
+
+			if(collisions[0].distance > 0  && collisions[0].distance < 60){
+
+
+					 if(collisions[0].object.name === imgCasaA.name){
+
+					 	console.log('match!!!!!!!!!!!!!!!');
+					 }
+
+				infoDoc.style.display = "block";
+
+				window.onkeyup = function(e) {
+				var key = e.keyCode ? e.keyCode : e.which;
+			      displayModelsInfo(imgCasaA,key);
+
+				}
+
+
+			}else{
+				infoDoc.style.display = "none";
+			}
+
+			if(collisions[0].distance > 4 && collisions[0].distance < 10){
+				prev_pos_x = controls.getObject().position.x;
+				prev_pos_z = controls.getObject().position.z;
+			}
+			if(collisions[0].distance < 3){
+
+
+
+
+				controls.getObject().position.x = prev_pos_x;
+				controls.getObject().position.z = prev_pos_z;
+			}
+		}
+	}
 }
+
+function displayModelsInfo(model,key){
+
+	
+
+					if (key === 13){
+						if(model.style.display = "none"){								 		
+							model.style.display = "block";
+							semaforo++;
+						}					
+					}
+
+					if(semaforo % 2 === 0){
+						
+						model.style.display = "none";
+						
+					}
+
+}
+
+
+function myKeyPress(e){
+	var keynum;
+
+    if(window.event) { // IE                    
+    	keynum = e.keyCode;
+    } else if(e.which){ // Netscape/Firefox/Opera                   
+    	keynum = e.which;
+    }
+
+    alert(String.fromCharCode(keynum));
+}
+
+
 /************************************Fim detectColision***********************/
 
 // cilpControl( gui, mixer, bonesClip, [ null, animation] );
