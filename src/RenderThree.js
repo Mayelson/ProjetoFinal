@@ -454,7 +454,7 @@ function onKeyUp( event ) {
 
 				/************************************Inicio initMesshesFirstFase***********************/
 				function initMesshesFirstFase() {
-					var casaA, casaB, terreno, animation;
+					var casaA, casaB, terreno, animation; 
 					var arvore, arvore2, arvore3, arvore4,arvoreNova, arbustos, arvoreNova2;
 					var barraca;
 					var max_displacement = 0.2;
@@ -574,12 +574,13 @@ function onKeyUp( event ) {
 				}
 				
 
-				new THREE.ObjectLoader().load( "../src/models/pump.json", function ( model ) {
-					model.scale.set(1,1,1);
+				new THREE.ObjectLoader().load( "../src/models/door.json", function ( model ) {
+					model.scale.set(40,40,40);
 					model.position.y = -40;
-					model.position.z = -500;
-					model.position.x = -400;
-					// scene.add( model );
+					model.position.z = -372;
+					model.position.x = 260;
+					model.n
+					scene.add( model );
 					mixer = new THREE.AnimationMixer( model );
 					mixer.clipAction( model.animations[ 0 ] ).play();
 
@@ -650,7 +651,8 @@ function eventWalkStop(key){
 /************************************Inicio animate***********************/
 function animate() {
 
-	//mixer.update( clock.getDelta() );
+	
+	mixer.update(clock.getDelta());
 	render();
 	detectColision();
 	if(isActiveAuto === true){
