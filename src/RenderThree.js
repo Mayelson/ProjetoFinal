@@ -525,7 +525,7 @@ function onKeyUp( event ) {
 					terreno = new THREE.Mesh( geometry, materials );
 					terreno.scale.set(12,12,12);
 					terreno.position.y = -40;
-					terreno.position.z = -500;
+					terreno.position.z = -510;
 					terreno.position.x = Math.PI/2;
 					scene.add( terreno );
 				}
@@ -569,7 +569,7 @@ function onKeyUp( event ) {
 					drenos.position.y = -40;
 					drenos.position.z = -20;
 					drenos.position.x = -210;
-					scene.add(drenos);
+					//scene.add(drenos);
 
 				}
 				
