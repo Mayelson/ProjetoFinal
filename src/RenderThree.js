@@ -524,7 +524,7 @@ function onKeyUp( event ) {
 				function addModelToScene3( geometry, materials ) {
 					terreno = new THREE.Mesh( geometry, materials );
 					terreno.scale.set(12,12,12);
-					terreno.position.y = -40;
+					terreno.position.y = 1458;
 					terreno.position.z = -510;
 					terreno.position.x = Math.PI/2;
 					scene.add( terreno );
@@ -579,8 +579,8 @@ function onKeyUp( event ) {
 					model.position.y = -40;
 					model.position.z = -372;
 					model.position.x = 260;
-					model.n
-					scene.add( model );
+				
+					// scene.add( model );
 					mixer = new THREE.AnimationMixer( model );
 					mixer.clipAction( model.animations[ 0 ] ).play();
 
@@ -652,7 +652,7 @@ function eventWalkStop(key){
 function animate() {
 
 	
-	mixer.update(clock.getDelta());
+	// mixer.update(clock.getDelta());
 	render();
 	detectColision();
 	if(isActiveAuto === true){
