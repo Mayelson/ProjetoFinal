@@ -20,25 +20,26 @@ var RADIUS = 20;
 var x = 50;
 var y = 50;
 
-var lastSprite;
-var sprites=[];
 var raycaster;
 var moveForward = false;
 var moveBackward = false;
 var moveLeft = false;
 var moveRight = false;
 
+
+var doors=[];
+
 var prevTime = performance.now();
 var velocity = new THREE.Vector3();
 var direction = new THREE.Vector3();
 var vertex = new THREE.Vector3();
 var color = new THREE.Color();
-
+var close = true;
+var timeDoor = 0;
 var tube;
 var parent;
 var cont = 0;
 var looptime = 350000;
-var vertices = [];
 var path;
 var spline;
 var drenos;
@@ -48,8 +49,8 @@ var normal = new THREE.Vector3();
 
 var crono = 0;
 var mixer, facesClip, bonesClip,helper;
-
-
+var animation;
+var animationClips = [];
 var pipeSpline = new THREE.CatmullRomCurve3( [
 	new THREE.Vector3( -229,0, -165 ),
 	new THREE.Vector3(142,0, -165 ),
@@ -229,19 +230,19 @@ function pointerLock(){
 
 				blocker.style.display = 'none';
 				console.log('The pointer lock status is now locked');
-   				
 
-   				} else {
-   					controls.enabled = false;
-   					blocker.style.display = 'block';
-   					instructions.style.display = '';
-   					console.log('The pointer lock status is now unlocked');  
-    		
-    		}
-    	};
-    	var pointerlockerror = function ( event ) {
-    		instructions.style.display = '';
-    	};
+
+			} else {
+				controls.enabled = false;
+				blocker.style.display = 'block';
+				instructions.style.display = '';
+				console.log('The pointer lock status is now unlocked');  
+
+			}
+		};
+		var pointerlockerror = function ( event ) {
+			instructions.style.display = '';
+		};
 		// Hook pointer lock state change events
 
 		document.addEventListener( 'pointerlockchange', pointerlockchange, false );
@@ -262,17 +263,7 @@ function pointerLock(){
 
 }
 
-function displayText(sprite){
 
-	
-	
-	//controls.enabled=false;
-    //blocker.style.display = 'block';
-	//infoModelos.style.display = 'block';
-
-
-
-}
 
 
 
@@ -402,216 +393,170 @@ function onKeyUp( event ) {
 			dataGui.add(options, 'reset')
 		}
 		/************************************Fim guiData***********************/
+			// FIM PLACAS
+
+			/************************************Inicio initMesshesFirstFase***********************/
+			function initMesshesFirstFase(){
+				var casaA, casaB, terreno; 
+				var arvore, arvore2, arvore3, arvore4,arvoreNova, arbustos, arvoreNova2;
+				var barraca;
+				var max_displacement = 0.2;
+				var scale = 2;
+				const manager = initLoadingManager();
+				const loader = new THREE.JSONLoader(manager);
+				const loaderFbx = new THREE.JSONLoader(manager);
+				var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
+								//primeira fase
+								if (fase == 1) {
+									loader.load( "../src/models/buildA.json", addModelToScene, manager.onProgress, manager.onError);
+									// After loading JSON from our file, we add it to the scene
+									function addModelToScene( geometry, materials ) {
+										var casaA = new THREE.Mesh( geometry, materials );
+										casaA.scale.set(40,40,40);
+										casaA.position.y = -40;
+										casaA.position.z = -20;
+										casaA.position.x = -210;
+										casaA.name = "CasaA";									
+										scene.add( casaA );
+										objects.push(casaA);
+									}
+
+									loader.load( "../src/models/buildB.json", addModelToScene2, manager.onProgress, manager.onError);
+									// After loading JSON from our file, we add it to the scene
+									function addModelToScene2( geometry, materials ) {
+										casaB = new THREE.Mesh( geometry, materials );
+										casaB.scale.set(40,40,40);
+										casaB.position.y = -40;
+										casaB.position.z = 0;
+										casaB.position.x = -220;
+										casaB.name = "CasaB";
+										scene.add( casaB );
+										objects.push(casaB);
+									}
 
 
-				// placas
-				function centroid(mesh) {
-
-					var centroidAux = new THREE.Vector3();
-					for (var i = 0, l = mesh.geometry.vertices.length; i < l; i++) {
-						centroidAux.add(mesh.geometry.vertices[i]);
-					}
-					centroidAux.divideScalar(mesh.geometry.vertices.length);
-
-					return centroidAux;
-				}
-
-				function loadText(mesh) {
-
-					var texture;
-
-					switch (mesh.name) {
-						case 'CasaB':
-						texture = new THREE.TextureLoader().load("../src/textures/texto_2048_casaGuarda.png");
-						break;
-						case 'CasaA':
-						texture = new THREE.TextureLoader().load("../src/textures/texto_2048_igreja.png");
-						break;
-
-						default:
-						texture = new THREE.TextureLoader().load("textures/texto_2048_error.png");
-						break;
-					}
-
-					var spriteMaterial;
-					spriteMaterial = new THREE.SpriteMaterial({map: texture, color: 0xffffff});
-
-					var sprite = new THREE.Sprite(spriteMaterial);
-					sprite.scale.set(40, 40, 40);
-
-					var centroidAux = centroid(mesh);
-    //console.log(centroid(mesh));
-
-    sprite.name = mesh.name;
-    sprites.push(sprite);
-}
+									loader.load( "../src/models/arvoreV9.json", addModelToScene15, manager.onProgress, manager.onError);
+									function addModelToScene15( geometry, materials ) {
+										arvoreNova = new THREE.Mesh( geometry, materials );
+										arvoreNova.scale.set(40,40,40);
+										arvoreNova.position.y = -40;
+										arvoreNova.position.z = 200;
+										arvoreNova.position.x = -550;
+										arvoreNova.name = "arvore9";
+										scene.add( arvoreNova );
+										objects.push(arvoreNova);
+									}
 
 
+									loader.load( "../src/models/arvoreV10.json", addModelToScene16, manager.onProgress, manager.onError);
+									function addModelToScene16( geometry, materials ) {
+										arvoreNova2 = new THREE.Mesh( geometry, materials );
+										arvoreNova2.scale.set(20,20,20);
+										arvoreNova2.position.y = -40;
+										arvoreNova2.position.z = 600;
+										arvoreNova2.position.x = -550;
+										arvoreNova2.name = "arvore10";
+										scene.add( arvoreNova2 );
+										objects.push(arvoreNova2);
+									}
+
+									loader.load( "../src/models/gradient.json", addModelToScene3, manager.onProgress, manager.onError);
+									// After loading JSON from our file, we add it to the scene
+									function addModelToScene3( geometry, materials ) {
+										terreno = new THREE.Mesh( geometry, materials );
+										terreno.scale.set(12,12,12);
+										terreno.position.y = 1458;
+										terreno.position.z = -510;
+										terreno.position.x = Math.PI/2;
+										scene.add( terreno );
+									}
+
+									loader.load( "../src/models/arbustosv3.json", addModelToScene5, manager.onProgress, manager.onError);
+									// After loading JSON from our file, we add it to the scene
+									function addModelToScene5( geometry, materials ) {
+										arbustos = new THREE.Mesh( geometry, materials );
+										arbustos.scale.set(0.3,0.3,0.3);
+										arbustos.position.y = -40;
+										arbustos.position.z = 100;
+										arbustos.position.x = -550;
+										scene.add( arbustos );
+									}
+
+									loader.load( "../src/models/sobreiro.json", addModelToScene12);
+									// After loading JSON from our file, we add it to the scene
+									function addModelToScene12( geometry, materials ) {
+										arvore4 = new THREE.Mesh( geometry, materials );
+										arvore4.scale.set(30,30,30)
+										arvore4.position.y = -40;
+										arvore4.position.z = -200;
+										arvore4.position.x = -500;
+										arvore4.name = "sobreiro";
+										var arvore5 = arvore4.clone();
+										arvore5.scale.set(40,40,40)
+										arvore5.position.y = -40;
+										arvore5.position.z = -500;
+										arvore5.position.x = -300;
+										scene.add( arvore4 );
+										scene.add( arvore5 );
+										objects.push(arvore4);
+										objects.push(arvore5);
+									}
+
+									loader.load( "../src/models/drenos.json", addModelToScene13);
+									// After loading JSON from our file, we add it to the scene
+									function addModelToScene13( geometry, materials ) {
+										drenos = new THREE.Mesh( geometry, materials );
+										drenos.scale.set(40,40,40)
+										drenos.position.y = -40;
+										drenos.position.z = -20;
+										drenos.position.x = -210;
+										//scene.add(drenos);
+										
+
+									}
+									
+
+									new THREE.ObjectLoader().load( "../src/models/door.json", function ( model ) {
+										model.scale.set(40,40,40);
+										model.position.y = -40;
+										model.position.z = -372;
+										model.position.x = 260;
+										model.name = "door";
+										scene.add( model );
+										doors.push(model);
+										objects.push(model.children[0]);
+										mixer = new THREE.AnimationMixer(model);
+										animationClips.push(mixer.getRoot().animations[0]);
+										animation = mixer.clipAction(animationClips[0]);
+
+									
+									} );
 
 
-
-				// FIM PLACAS
-
-				/************************************Inicio initMesshesFirstFase***********************/
-				function initMesshesFirstFase() {
-					var casaA, casaB, terreno, animation; 
-					var arvore, arvore2, arvore3, arvore4,arvoreNova, arbustos, arvoreNova2;
-					var barraca;
-					var max_displacement = 0.2;
-					var scale = 2;
-					const manager = initLoadingManager();
-					const loader = new THREE.JSONLoader(manager);
-					const loaderFbx = new THREE.JSONLoader(manager);
-					var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
-			//primeira fase
-			if (fase == 1) {
-				loader.load( "../src/models/buildA.json", addModelToScene, manager.onProgress, manager.onError);
-				// After loading JSON from our file, we add it to the scene
-				function addModelToScene( geometry, materials ) {
-					var casaA = new THREE.Mesh( geometry, materials );
-					casaA.scale.set(40,40,40);
-					casaA.position.y = -40;
-					casaA.position.z = -20;
-					casaA.position.x = -210;
-					casaA.name = "CasaA";
-					loadText(casaA);
-					scene.add( casaA );
-					objects.push(casaA);
-				}
-
-				loader.load( "../src/models/buildB.json", addModelToScene2, manager.onProgress, manager.onError);
-				// After loading JSON from our file, we add it to the scene
-				function addModelToScene2( geometry, materials ) {
-					casaB = new THREE.Mesh( geometry, materials );
-					casaB.scale.set(40,40,40);
-					casaB.position.y = -40;
-					casaB.position.z = 0;
-					casaB.position.x = -220;
-					casaB.name = "CasaB";
-					loadText(casaB);
-					scene.add( casaB );
-					objects.push(casaB);
-				}
+								} else if (fase == 2) {
+									console.log("Fase 2 A carregar");
+								}
+								initTexture(manager); 
+							// //Load Textures
+							// var imagePrefix = "../src/img/mirobriga/panoramica/";
+							// var directions = ["posx","negx","","","posz","negz"];
+							// var imageSuffix = ".jpg";
+							// var cubeMaterials = [];
+							// for(var i = 0; i < 6; i++ )
+							// 	cubeMaterials.push(new THREE.MeshBasicMaterial({
+							// 		map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix),
+							// 		side: THREE.BackSide
+							// 	}));
+							// var cube = new THREE.Mesh( geometry, cubeMaterials );
+							// cube.position.set(50000,59000,0);
+							// scene.add( cube );
+							// cube.rotation.y=9;
+						}
+						/************************************Fim initMesshesFirstFase***********************/
 
 
-				loader.load( "../src/models/arvoreV9.json", addModelToScene15, manager.onProgress, manager.onError);
-				function addModelToScene15( geometry, materials ) {
-					arvoreNova = new THREE.Mesh( geometry, materials );
-					arvoreNova.scale.set(40,40,40);
-					arvoreNova.position.y = -40;
-					arvoreNova.position.z = 200;
-					arvoreNova.position.x = -550;
-					arvoreNova.name = "arvore9";
-					scene.add( arvoreNova );
-					objects.push(arvoreNova);
-				}
-
-
-				loader.load( "../src/models/arvoreV10.json", addModelToScene16, manager.onProgress, manager.onError);
-				function addModelToScene16( geometry, materials ) {
-					arvoreNova2 = new THREE.Mesh( geometry, materials );
-					arvoreNova2.scale.set(20,20,20);
-					arvoreNova2.position.y = -40;
-					arvoreNova2.position.z = 600;
-					arvoreNova2.position.x = -550;
-					arvoreNova2.name = "arvore10";
-					scene.add( arvoreNova2 );
-					objects.push(arvoreNova2);
-				}
-
-				loader.load( "../src/models/gradient.json", addModelToScene3, manager.onProgress, manager.onError);
-				// After loading JSON from our file, we add it to the scene
-				function addModelToScene3( geometry, materials ) {
-					terreno = new THREE.Mesh( geometry, materials );
-					terreno.scale.set(12,12,12);
-					terreno.position.y = 1458;
-					terreno.position.z = -510;
-					terreno.position.x = Math.PI/2;
-					scene.add( terreno );
-				}
-
-				loader.load( "../src/models/arbustosv3.json", addModelToScene5, manager.onProgress, manager.onError);
-				// After loading JSON from our file, we add it to the scene
-				function addModelToScene5( geometry, materials ) {
-					arbustos = new THREE.Mesh( geometry, materials );
-					arbustos.scale.set(0.3,0.3,0.3);
-					arbustos.position.y = -40;
-					arbustos.position.z = 100;
-					arbustos.position.x = -550;
-					scene.add( arbustos );
-				}
-
-				loader.load( "../src/models/sobreiro.json", addModelToScene12);
-				// After loading JSON from our file, we add it to the scene
-				function addModelToScene12( geometry, materials ) {
-					arvore4 = new THREE.Mesh( geometry, materials );
-					arvore4.scale.set(30,30,30)
-					arvore4.position.y = -40;
-					arvore4.position.z = -200;
-					arvore4.position.x = -500;
-					arvore4.name = "sobreiro";
-					var arvore5 = arvore4.clone();
-					arvore5.scale.set(40,40,40)
-					arvore5.position.y = -40;
-					arvore5.position.z = -500;
-					arvore5.position.x = -300;
-					scene.add( arvore4 );
-					scene.add( arvore5 );
-					objects.push(arvore4);
-					objects.push(arvore5);
-				}
-
-				loader.load( "../src/models/drenos.json", addModelToScene13);
-				// After loading JSON from our file, we add it to the scene
-				function addModelToScene13( geometry, materials ) {
-					drenos = new THREE.Mesh( geometry, materials );
-					drenos.scale.set(40,40,40)
-					drenos.position.y = -40;
-					drenos.position.z = -20;
-					drenos.position.x = -210;
-					//scene.add(drenos);
-
-				}
-				
-
-				new THREE.ObjectLoader().load( "../src/models/door.json", function ( model ) {
-					model.scale.set(40,40,40);
-					model.position.y = -40;
-					model.position.z = -372;
-					model.position.x = 260;
-				
-					// scene.add( model );
-					mixer = new THREE.AnimationMixer( model );
-					mixer.clipAction( model.animations[ 0 ] ).play();
-
-					animate();
-				} );
-
-
-			} else if (fase == 2) {
-				console.log("Fase 2 A carregar");
-			}
-			initTexture(manager); 
-		// //Load Textures
-		// var imagePrefix = "../src/img/mirobriga/panoramica/";
-		// var directions = ["posx","negx","","","posz","negz"];
-		// var imageSuffix = ".jpg";
-		// var cubeMaterials = [];
-		// for(var i = 0; i < 6; i++ )
-		// 	cubeMaterials.push(new THREE.MeshBasicMaterial({
-		// 		map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix),
-		// 		side: THREE.BackSide
-		// 	}));
-		// var cube = new THREE.Mesh( geometry, cubeMaterials );
-		// cube.position.set(50000,59000,0);
-		// scene.add( cube );
-		// cube.rotation.y=9;
-	}
-	/************************************Fim initMesshesFirstFase***********************/
-
-
-	/************************************Inicio animate***********************/
-	function initTexture(manager) {
+						/************************************Inicio animate***********************/
+						function initTexture(manager) {
 
 	// instantiate a loader
 	var geometry = new THREE.BoxGeometry( 200000, 160000, 200000 );
@@ -651,10 +596,12 @@ function eventWalkStop(key){
 /************************************Inicio animate***********************/
 function animate() {
 
-	
-	// mixer.update(clock.getDelta());
+		if(!close){
+			mixer.update(clock.getDelta());
+		}
 	render();
 	detectColision();
+
 	if(isActiveAuto === true){
 		crono++;
 		drawPath();
@@ -664,6 +611,7 @@ function animate() {
 	// console.log("X" + controls.getObject().position.x);
 	// console.log("Z" + controls.getObject().position.z);
 	// console.log('R' + controls.getObject().rotation.y + "H");
+	
 	requestAnimationFrame( animate );	
 }
 /************************************Fim animate***********************/
@@ -727,6 +675,7 @@ function animationCamera(){
 		function render(){
 			
 			renderer.render( scene,  camera );
+
 		}
 
 		/************************************Inicio controls***********************/
@@ -757,20 +706,18 @@ function animationCamera(){
 /************************************Inicio detectColision***********************/
 function detectColision() {
 
-
-
-
+// console.log(animationClips);
 	var prev_pos_x = controls.getObject().position.x;
 	var prev_pos_z = controls.getObject().position.z;
 	var infoDoc = document.getElementById('modelsInfo');
 	var imgCasaA = document.getElementById('imgCasaA');
 	var imgCasaB = document.getElementById('imgCasaB');
-	
+
 	player.mesh = new THREE.Object3D();
 	listenControls();
 	player.rays = [
 	new THREE.Vector3(0, 0, 1),
-	new THREE.Vector3(1, 0, 1),
+	new THREE.Vector3(1, 0, 1),	
 	new THREE.Vector3(1, 0, 0),
 	new THREE.Vector3(1, 0, -1),
 	new THREE.Vector3(0, 0, -1),
@@ -783,6 +730,7 @@ function detectColision() {
 
 	player.raycaster = new THREE.Raycaster();
 	var i, collisions;
+
 	if((controls.getObject().position.x > 660 && controls.getObject().position.x < 670) || (controls.getObject().position.x < -694 && controls.getObject().position.x > - 704) || (controls.getObject().position.z > 850 && controls.getObject().position.z < 950 ) || (controls.getObject().position.z < -850 && controls.getObject().position.z > -950) ){
 
 		prev_pos_x = controls.getObject().position.x;
@@ -793,73 +741,93 @@ function detectColision() {
 		controls.getObject().position.x = prev_pos_x;
 		controls.getObject().position.z = prev_pos_z;
 	}
-
+					
 	for(i = 0; i<player.rays.length; i++){
 		player.raycaster.set(controls.getObject().position, player.rays[i] );
 		collisions = player.raycaster.intersectObjects(objects);
+		
+
+			// if(collisionsDoors.length > 0){
+
+			// 							
+
+			// 	}
 
 
 		if(collisions.length > 0){
 
+				if(collisions[0].object.name === doors[0].children[0].name){
+											
+						if(collisions[0].distance < 80){
+
+					    animation.setLoop(THREE.LoopOnce);
+						animation.clampWhenFinished = true;
+						animation.enabled = true;
+						animation.play();
+						
+						close = false;
+						}
+
+						
+
+						
+					}
+			
 			if(collisions[0].distance > 0  && collisions[0].distance < 60){
 
+					 infoDoc.style.display = "block";
 
-					 if(collisions[0].object.name === imgCasaA.name){
+					 window.onkeyup = function(e) {
+					 	var key = e.keyCode ? e.keyCode : e.which;
+					 	displayModelsInfo(imgCasaA,key);
 
-					 	console.log('match!!!!!!!!!!!!!!!');
 					 }
 
-				infoDoc.style.display = "block";
 
-				window.onkeyup = function(e) {
-				var key = e.keyCode ? e.keyCode : e.which;
-			      displayModelsInfo(imgCasaA,key);
+					}else{
+						infoDoc.style.display = "none";
+					}
 
+					if(collisions[0].distance > 4 && collisions[0].distance < 10){
+						prev_pos_x = controls.getObject().position.x;
+						prev_pos_z = controls.getObject().position.z;
+					}
+					if(collisions[0].distance < 3){
+
+
+
+
+						controls.getObject().position.x = prev_pos_x;
+						controls.getObject().position.z = prev_pos_z;
+					}
 				}
 
-
-			}else{
-				infoDoc.style.display = "none";
+			
 			}
 
-			if(collisions[0].distance > 4 && collisions[0].distance < 10){
-				prev_pos_x = controls.getObject().position.x;
-				prev_pos_z = controls.getObject().position.z;
-			}
-			if(collisions[0].distance < 3){
-
-
-
-
-				controls.getObject().position.x = prev_pos_x;
-				controls.getObject().position.z = prev_pos_z;
-			}
+		
 		}
-	}
-}
 
-function displayModelsInfo(model,key){
+		function displayModelsInfo(model,key){
 
-	
+			if (key === 13){
+				if(model.style.display = "none"){								 		
+					model.style.display = "block";
+					semaforo++;
+				}					
+			}
 
-					if (key === 13){
-						if(model.style.display = "none"){								 		
-							model.style.display = "block";
-							semaforo++;
-						}					
-					}
+			if(semaforo % 2 === 0){
 
-					if(semaforo % 2 === 0){
-						
-						model.style.display = "none";
-						
-					}
+				model.style.display = "none";
 
-}
+			}
+
+		}
 
 
-function myKeyPress(e){
-	var keynum;
+		function myKeyPress(e){
+			var keynum;
 
     if(window.event) { // IE                    
     	keynum = e.keyCode;
