@@ -15,7 +15,6 @@ var isActiveAuto = false;
 var elementArea = null;
 var controlsButtons = false;
 var semaforo = 0;
-
 var RADIUS = 20;
 var x = 50;
 var y = 50;
@@ -25,6 +24,8 @@ var moveForward = false;
 var moveBackward = false;
 var moveLeft = false;
 var moveRight = false;
+
+var isDoorOpen = false;
 
 
 var doors=[];
@@ -48,8 +49,8 @@ var binormal = new THREE.Vector3();
 var normal = new THREE.Vector3();
 
 var crono = 0;
-var mixer, facesClip, bonesClip,helper;
-var animation;
+var mixer, mixer2, mixer3, mixer4, mixer5, mixer6, mixer7, facesClip, bonesClip,helper;
+var animation, animation2, animation3, animation4, animation5, animation6, animation7;
 var animationClips = [];
 var pipeSpline = new THREE.CatmullRomCurve3( [
 	new THREE.Vector3( -229,0, -165 ),
@@ -502,36 +503,132 @@ function onKeyUp( event ) {
 										objects.push(arvore5);
 									}
 
-									loader.load( "../src/models/drenos.json", addModelToScene13);
-									// After loading JSON from our file, we add it to the scene
-									function addModelToScene13( geometry, materials ) {
-										drenos = new THREE.Mesh( geometry, materials );
-										drenos.scale.set(40,40,40)
-										drenos.position.y = -40;
-										drenos.position.z = -20;
-										drenos.position.x = -210;
-										//scene.add(drenos);
-										
+							
 
-									}
-									
+									new THREE.ObjectLoader().load( "../src/models/doorV4.json", function ( model ) {
 
-									new THREE.ObjectLoader().load( "../src/models/door.json", function ( model ) {
 										model.scale.set(40,40,40);
 										model.position.y = -40;
-										model.position.z = -372;
+										model.position.z = -371;
 										model.position.x = 260;
 										model.name = "door";
 										scene.add( model );
 										doors.push(model);
 										objects.push(model.children[0]);
 										mixer = new THREE.AnimationMixer(model);
+										mixer.getRoot().animations[0].name = 'porta1casa2';
 										animationClips.push(mixer.getRoot().animations[0]);
 										animation = mixer.clipAction(animationClips[0]);
+										mixer.ativo = false;
+																																					
+										} );
 
-									
-									} );
+									new THREE.ObjectLoader().load( "../src/models/doorV5.json", function ( door2 ) {
 
+										door2.scale.set(40,40,40);
+										door2.position.y = -40;
+										door2.position.z = -370;
+										door2.position.x = 117;
+										door2.name = "door2";
+										scene.add(door2);
+										doors.push(door2);										
+										objects.push(door2.children[0]);
+										mixer2 = new THREE.AnimationMixer(door2);
+										mixer2.getRoot().animations[0].name = 'porta2casa2';
+										animationClips.push(mixer2.getRoot().animations[0]);
+										animation2 = mixer2.clipAction(animationClips[1]);
+										mixer2.ativo = false;
+									});
+
+									new THREE.ObjectLoader().load( "../src/models/doorV6.json", function ( door3 ) {
+
+										door3.scale.set(40,40,40);
+										door3.position.y = -40;
+										door3.position.z = 84;
+										door3.position.x = 118;
+										door3.rotation.y = 1.5;
+										door3.name = "door3";
+										scene.add(door3);
+										doors.push(door3);										
+										objects.push(door3.children[0]);
+										mixer3 = new THREE.AnimationMixer(door3);
+										mixer3.getRoot().animations[0].name = 'porta1casa1';
+										animationClips.push(mixer3.getRoot().animations[0]);
+										animation3 = mixer3.clipAction(animationClips[2]);
+										mixer3.ativo = false;
+									});
+
+									new THREE.ObjectLoader().load( "../src/models/doorV7.json", function ( door4 ) {
+
+										door4.scale.set(40,40,40);
+										door4.position.y = -40;
+										door4.position.z = 228;
+										door4.position.x = 118;
+										door4.rotation.y = 1.5;
+										door4.name = "door4";
+										scene.add(door4);
+										doors.push(door4);										
+										objects.push(door4.children[0]);
+										mixer4 = new THREE.AnimationMixer(door4);
+										mixer4.getRoot().animations[0].name = 'porta2casa1';
+										animationClips.push(mixer4.getRoot().animations[0]);
+										animation4 = mixer4.clipAction(animationClips[3]);
+										mixer4.ativo = false;
+									});
+
+									new THREE.ObjectLoader().load( "../src/models/doorV8.json", function ( door5 ) {
+
+										door5.scale.set(40,40,40);
+										door5.position.y = -40;
+										door5.position.z = 84;
+										door5.position.x = -114;
+										door5.rotation.y = 1.5;
+										door5.name = "door5";
+										scene.add(door5);
+										doors.push(door5);										
+										objects.push(door5.children[0]);
+										mixer5 = new THREE.AnimationMixer(door5);
+										mixer5.getRoot().animations[0].name = 'porta3casa1';
+										animationClips.push(mixer5.getRoot().animations[0]);
+										animation5 = mixer5.clipAction(animationClips[4]);
+										mixer5.ativo = false;
+									});
+										
+
+									new THREE.ObjectLoader().load( "../src/models/doorV9.json", function ( door6 ) {
+
+										door6.scale.set(40,40,40);
+										door6.position.y = -40;
+										door6.position.z = 150;
+										door6.position.x = 330;										
+										door6.name = "door6";
+										scene.add(door6);
+										doors.push(door6);										
+										objects.push(door6.children[0]);
+										mixer6 = new THREE.AnimationMixer(door6);
+										mixer6.getRoot().animations[0].name = 'porta4casa1';
+										animationClips.push(mixer6.getRoot().animations[0]);
+										animation6 = mixer6.clipAction(animationClips[5]);
+										mixer6.ativo = false;
+									});	
+
+
+									new THREE.ObjectLoader().load( "../src/models/doorV10.json", function ( door7 ) {
+
+										door7.scale.set(40,40,40);
+										door7.position.y = -40;
+										door7.position.z = 195;
+										door7.position.x = 135;										
+										door7.name = "door7";
+										scene.add(door7);
+										doors.push(door7);										
+										objects.push(door7.children[0]);
+										mixer7 = new THREE.AnimationMixer(door7);
+										mixer7.getRoot().animations[0].name = 'porta5casa1';
+										animationClips.push(mixer7.getRoot().animations[0]);
+										animation7 = mixer7.clipAction(animationClips[6]);
+										mixer7.ativo = false;
+									});	
 
 								} else if (fase == 2) {
 									console.log("Fase 2 A carregar");
@@ -597,8 +694,30 @@ function eventWalkStop(key){
 function animate() {
 
 		if(!close){
-			mixer.update(clock.getDelta());
+			if(mixer.ativo){
+				mixer.update(clock.getDelta());
+			}
+			if(mixer2.ativo){
+				mixer2.update(clock.getDelta());
+			}
+			if(mixer3.ativo){
+				mixer3.update(clock.getDelta());
+			}
+			if(mixer4.ativo){
+				mixer4.update(clock.getDelta());
+			}
+			if(mixer5.ativo){
+				mixer5.update(clock.getDelta());
+			}
+			if(mixer6.ativo){
+				mixer6.update(clock.getDelta());
+			}
+			if(mixer7.ativo){
+				mixer7.update(clock.getDelta());
+			}
 		}
+
+
 	render();
 	detectColision();
 
@@ -754,24 +873,68 @@ function detectColision() {
 			// 	}
 
 
+
 		if(collisions.length > 0){
-
-				if(collisions[0].object.name === doors[0].children[0].name){
-											
-						if(collisions[0].distance < 80){
-
-					    animation.setLoop(THREE.LoopOnce);
-						animation.clampWhenFinished = true;
-						animation.enabled = true;
-						animation.play();
+	
+				
+				if(collisions[0].object.name === 'porta1casa2'){	
 						
-						close = false;
-						}
-
-						
-
-						
+						playAnimation(collisions, animation, mixer);
+						mixer.ativo = true;
 					}
+
+
+				if(collisions[0].object.name === 'porta2casa2'){
+					playAnimation(collisions, animation2, mixer2);
+					mixer2.ativo = true;
+					mixer.ativo = false;									
+				}
+
+				if(collisions[0].object.name === 'porta1casa1'){
+					playAnimation(collisions, animation3, mixer3);
+					mixer.ativo = false;
+					mixer2.ativo = false;
+					mixer3.ativo = true;													
+				}
+
+				if(collisions[0].object.name === 'porta2casa1'){
+					playAnimation(collisions, animation4, mixer4);
+					mixer.ativo = false;
+					mixer2.ativo = false;
+					mixer3.ativo = false;
+					mixer4.ativo = true;													
+				}
+
+				if(collisions[0].object.name === 'porta3casa1'){
+					playAnimation(collisions, animation5, mixer5);
+					mixer.ativo = false;
+					mixer2.ativo = false;
+					mixer3.ativo = false;
+					mixer4.ativo = false;
+					mixer5.ativo = true;													
+				}
+
+				if(collisions[0].object.name === 'porta4casa1'){
+					playAnimation(collisions, animation6, mixer6);
+					mixer.ativo = false;
+					mixer2.ativo = false;
+					mixer3.ativo = false;
+					mixer4.ativo = false;
+					mixer5.ativo = false;
+					mixer6.ativo = true;													
+				}
+
+				if(collisions[0].object.name === 'porta5casa1'){
+					playAnimation(collisions, animation7, mixer7);
+					mixer.ativo = false;
+					mixer2.ativo = false;
+					mixer3.ativo = false;
+					mixer4.ativo = false;
+					mixer5.ativo = false;
+					mixer6.ativo = false;
+					mixer7.ativo = true;													
+				}
+
 			
 			if(collisions[0].distance > 0  && collisions[0].distance < 60){
 
@@ -794,9 +957,6 @@ function detectColision() {
 					}
 					if(collisions[0].distance < 3){
 
-
-
-
 						controls.getObject().position.x = prev_pos_x;
 						controls.getObject().position.z = prev_pos_z;
 					}
@@ -807,6 +967,31 @@ function detectColision() {
 
 		
 		}
+
+				function playAnimation(collisions, animation, mixer){
+
+						var distance = collisions[0].distance;
+											
+						if(distance < 60){
+
+					    animation.setLoop(THREE.LoopOnce);
+						animation.clampWhenFinished = true;
+						animation.enabled = true;
+						animation.play();
+						
+						close = false;
+						isDoorOpen = true;
+						}
+						// }else if(distance > 80 && isDoorOpen){
+						// 	animation.enabled = false;
+						// 	isDoorOpen = false;
+						// 	close = true;
+						// 	animation.stop();
+						// 	console.log(distance);
+						// }
+					
+						
+					}
 
 		function displayModelsInfo(model,key){
 
@@ -857,7 +1042,7 @@ function initAudio(){
 		sound.setBuffer( buffer );
 		sound.setLoop( true );
 		sound.setVolume(0.5);
-		sound.play();
+		//sound.play();
 	});
 }
 /************************************Fim initAudio***********************/
