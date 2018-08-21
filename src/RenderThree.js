@@ -461,23 +461,23 @@ function onKeyUp( event ) {
 										objects.push(arvoreNova2);
 									}
 
-									loader.load( "../src/models/gradient.json", addModelToScene3, manager.onProgress, manager.onError);
+									loader.load( "../src/models/gradient2.json", addModelToScene3, manager.onProgress, manager.onError);
 									// After loading JSON from our file, we add it to the scene
 									function addModelToScene3( geometry, materials ) {
 										terreno = new THREE.Mesh( geometry, materials );
-										terreno.scale.set(12,12,12);
-										terreno.position.y = 1458;
-										terreno.position.z = -510;
-										terreno.position.x = Math.PI/2;
+										terreno.scale.set(0.16,0.16,0.16);
+										terreno.position.y = 5;
+										terreno.position.z = -50;
+										terreno.position.x = -610;
 										scene.add( terreno );
 									}
 
-									loader.load( "../src/models/arbustosv3.json", addModelToScene5, manager.onProgress, manager.onError);
+									loader.load( "../src/models/arbustosv4.json", addModelToScene5, manager.onProgress, manager.onError);
 									// After loading JSON from our file, we add it to the scene
 									function addModelToScene5( geometry, materials ) {
 										arbustos = new THREE.Mesh( geometry, materials );
 										arbustos.scale.set(0.3,0.3,0.3);
-										arbustos.position.y = -40;
+										arbustos.position.y = -35;
 										arbustos.position.z = 100;
 										arbustos.position.x = -550;
 										scene.add( arbustos );
