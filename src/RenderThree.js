@@ -461,14 +461,14 @@ function onKeyUp( event ) {
 										objects.push(arvoreNova2);
 									}
 
-									loader.load( "../src/models/gradient2.json", addModelToScene3, manager.onProgress, manager.onError);
+									loader.load( "../src/models/gradient3.json", addModelToScene3, manager.onProgress, manager.onError);
 									// After loading JSON from our file, we add it to the scene
 									function addModelToScene3( geometry, materials ) {
 										terreno = new THREE.Mesh( geometry, materials );
-										terreno.scale.set(0.16,0.16,0.16);
-										terreno.position.y = 5;
-										terreno.position.z = -50;
-										terreno.position.x = -610;
+										terreno.scale.set(11,11,11);
+										terreno.position.y = -40;
+										terreno.position.z = -465;
+										terreno.position.x = 139;
 										scene.add( terreno );
 									}
 
