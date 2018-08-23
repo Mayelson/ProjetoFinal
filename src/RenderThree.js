@@ -428,7 +428,7 @@ function onKeyUp( event ) {
 										casaB = new THREE.Mesh( geometry, materials );
 										casaB.scale.set(40,40,40);
 										casaB.position.y = -40;
-										casaB.position.z = 0;
+										casaB.position.z = 2;
 										casaB.position.x = -220;
 										casaB.name = "CasaB";
 										scene.add( casaB );
@@ -465,10 +465,10 @@ function onKeyUp( event ) {
 									// After loading JSON from our file, we add it to the scene
 									function addModelToScene3( geometry, materials ) {
 										terreno = new THREE.Mesh( geometry, materials );
-										terreno.scale.set(11,11,11);
-										terreno.position.y = -40;
-										terreno.position.z = -465;
-										terreno.position.x = 139;
+										terreno.scale.set(1,1,1);
+										terreno.position.y = -38;
+										terreno.position.z = -455;
+										terreno.position.x = 149;
 										scene.add( terreno );
 									}
 
