@@ -461,7 +461,7 @@ function onKeyUp( event ) {
 										objects.push(arvoreNova2);
 									}
 
-									loader.load( "../src/models/gradient3.json", addModelToScene3, manager.onProgress, manager.onError);
+									loader.load( "../src/models/gradient2.json", addModelToScene3, manager.onProgress, manager.onError);
 									// After loading JSON from our file, we add it to the scene
 									function addModelToScene3( geometry, materials ) {
 										terreno = new THREE.Mesh( geometry, materials );
@@ -846,7 +846,8 @@ function detectColision() {
 	];
 
 
-
+// console.log("X: " + controls.getObject().position.x);
+// console.log("Z: " + controls.getObject().position.z);
 	player.raycaster = new THREE.Raycaster();
 	var i, collisions;
 
@@ -860,20 +861,13 @@ function detectColision() {
 		controls.getObject().position.x = prev_pos_x;
 		controls.getObject().position.z = prev_pos_z;
 	}
+
+
 					
 	for(i = 0; i<player.rays.length; i++){
 		player.raycaster.set(controls.getObject().position, player.rays[i] );
 		collisions = player.raycaster.intersectObjects(objects);
 		
-
-			// if(collisionsDoors.length > 0){
-
-			// 							
-
-			// 	}
-
-
-
 		if(collisions.length > 0){
 	
 				
@@ -937,9 +931,20 @@ function detectColision() {
 
 			
 			if(collisions[0].distance > 0  && collisions[0].distance < 60){
+				//console.log(collisions[0].object.name);
 
 					 infoDoc.style.display = "block";
 
+					 if(collisions[0].object.name === 'CasaA'){
+
+					 		if( 136 < controls.getObject().position.x && controls.getObject().position.x < 315 && -419 < controls.getObject().position.z && controls.getObject().position.z < -285 ){
+
+								console.log('harreum');
+								}
+					 }else{
+					 	console.log('CasaA');
+
+					 }
 					 window.onkeyup = function(e) {
 					 	var key = e.keyCode ? e.keyCode : e.which;
 					 	displayModelsInfo(imgCasaA,key);
